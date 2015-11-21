@@ -12,6 +12,9 @@ servlet but should be the only JSP outside of WEB-INF.
 else if (request.getParameter("msg") != null && request.getParameter("msg").toString().equals("true")) {
     response.sendRedirect("index.htm?msg=true");
 }
+else if (request.getParameter("msg") != null && request.getParameter("msg").toString().equals("falha")) {
+    response.sendRedirect("index.htm?msg=falha");
+}
 else {
     response.sendRedirect("index.htm?msg=false");
 } %>

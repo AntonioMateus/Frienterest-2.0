@@ -1,0 +1,22 @@
+optional match (n) optional match (n)-[r]-() delete n,r;
+
+CREATE (palavraChave1:PalavraChave {id:1, nome:'esportes'})
+CREATE (palavraChave2:PalavraChave {id:2, nome:'politica'})
+CREATE (palavraChave3:PalavraChave {id:3, nome:'educacao'})
+CREATE (palavraChave4:PalavraChave {id:4, nome:'meio_ambiente'})
+CREATE (palavraChave5:PalavraChave {id:5, nome:'informatica'})
+CREATE (palavraChave6:PalavraChave {id:6, nome:'cinema'})
+CREATE (palavraChave7:PalavraChave {id:7, nome:'teatro'})
+CREATE (palavraChave8:PalavraChave {id:8, nome:'psicologia'})
+CREATE (palavraChave9:PalavraChave {id:9, nome:'curiosidades'})
+CREATE (palavraChave10:PalavraChave {id:10, nome:'humor'})
+CREATE (palavraChave11:PalavraChave {id:11, nome:'saude'})
+CREATE (palavraChave12:PalavraChave {id:12, nome:'economia'})
+CREATE (palavraChave13:PalavraChave {id:13, nome:'noticias'})
+CREATE (palavraChave14:PalavraChave {id:14, nome:'marketing'})
+CREATE (palavraChave15:PalavraChave {id:15, nome:'musica'})
+CREATE (palavraChave16:PalavraChave {id:16, nome:'games'})
+CREATE (palavraChave17:PalavraChave {id:17, nome:'viagem'})
+CREATE (palavraChave18:PalavraChave {id:18, nome:'literatura'})
+CREATE (palavraChave19:PalavraChave {id:19, nome:'animais'})
+CREATE (palavraChave20:PalavraChave {id:20, nome:'series_televisao'});

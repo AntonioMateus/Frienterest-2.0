@@ -59,10 +59,6 @@
         <servlet-class>ExcluirConta</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>InicializacaoPalavrasChave</servlet-name>
-        <servlet-class>InicializacaoPalavrasChave</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>CadastroPagina</servlet-name>
         <servlet-class>CadastroPagina</servlet-class>
     </servlet>
@@ -97,10 +93,6 @@
     <servlet-mapping>
         <servlet-name>ExcluirConta</servlet-name>
         <url-pattern>/ExcluirConta</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>InicializacaoPalavrasChave</servlet-name>
-        <url-pattern>/InicializacaoPalavrasChave</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>CadastroPagina</servlet-name>
