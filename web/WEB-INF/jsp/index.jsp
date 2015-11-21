@@ -14,7 +14,7 @@
                 color:#FFFFFF;
                 text-align: center;
             }           
-            
+
             #intro {
                 background-color:#2980b9;
                 height: 120px; 
@@ -121,7 +121,7 @@
                 background: #fff;
 
             }
-            
+
             .imgClass {
                 background-image: url(http://i.imgur.com/sFE359B.jpg?1);
                 background-position: 0px 0px; 
@@ -138,9 +138,10 @@
     </head>
     <body>
         <% if (request.getParameter("msg") != null && request.getParameter("msg").toString().equals("true")) {
-        out.print ("<script>alert('Senha incorreta ! Por favor, tente novamente !')</script>"); }
-        else if (request.getParameter("msg") != null && request.getParameter("msg").toString().equals("false")) {
-        out.print ("<script>alert('Usuário não cadastrado ! Inscreva-se agora mesmo !')</script>"); }%>        
+                out.print("<script>alert('Senha incorreta ! Por favor, tente novamente !')</script>");
+            } else if (request.getParameter("msg") != null && request.getParameter("msg").toString().equals("false")) {
+                out.print("<script>alert('Usuário não cadastrado ! Inscreva-se agora mesmo !')</script>");
+            }%>        
         <div id="intro" class="row full-width">
 
             <div class="small-6 medium-1 large-2 columns auth-plain">
@@ -232,9 +233,9 @@
             <div class="small-12 medium-3 large-4 columns">
                 <i class="fi-laptop"></i>        
                 <!-- <form action="InicializacaoPalavrasChave" method="post">
-                    <!-- <i class="fi-laptop"></i> 
-                    <input type="submit" value="" class="imgClass">
-                </form> -->
+                <!-- <i class="fi-laptop"></i> 
+                <input type="submit" value="" class="imgClass">
+            </form> -->
 
                 <p>Inicialmente, a rede social Frienterest está disponível apenas para web. Trata-se de uma rede que usa uma nova tecnologia para armazenar dados de pessoas, bem como relacionamentos entre elas! Ficou curioso(a)? Inscreva-se hoje mesmo! </p>
 
@@ -242,42 +243,42 @@
 
             <div class="small-12 medium-3 large-4 columns">
                 <i class="fi-torso-business"></i>
-                <!--<form action="InicializacaoUsuarios" method="post">
-                    <!-- <i class="fi-torso-business"></i> 
+                <form action="InicializacaoUsuarios" method="post">
+                    <i class="fi-torso-business"></i> 
                     <input type="submit" value="" class="imgClass">
-                </form> -->
+                </form> 
 
                 <p>Os desenvolvedores desse projeto são Antonio Carlos Mateus da Silva e André Thomaz Gandolpho de Mello, ambos estudantes de Sistemas de Informação da EACH-USP.</p>
 
             </div>
 
-            
+
             <div class="small-12 medium-3 large-4 columns">
 
                 <h4>Outras redes</h4>
 
-                    <ul class="footer-links">
+                <ul class="footer-links">
 
-                        <li><a href="https://github.com/AntonioMateus/Frienterest">GitHub do projeto</a></li>
+                    <li><a href="https://github.com/AntonioMateus/Frienterest">GitHub do projeto</a></li>
 
-                        <li><a href="https://www.facebook.com/atgmello">Facebook (André Mello)</a></li>
+                    <li><a href="https://www.facebook.com/atgmello">Facebook (André Mello)</a></li>
 
-                        <li><a href="https://www.facebook.com/antonio.mateus.37">Facebook (Antonio Mateus)</a></li>
+                    <li><a href="https://www.facebook.com/antonio.mateus.37">Facebook (Antonio Mateus)</a></li>
 
-                        <ul>
+                    <ul>
 
-                            </div>
+                        </div>
 
-                            </div>
+                        </div>
 
-                            </footer>
+                        </footer>
 
-                                <script src="js/vendor/jquery.js"></script>
-                                <script src="js/foundation.min.js"></script>
-                                <script>
-                                $(document).foundation();
-                                </script>
-                           
+                        <script src="js/vendor/jquery.js"></script>
+                        <script src="js/foundation.min.js"></script>
+                        <script>
+                            $(document).foundation();
+                        </script>
 
-    </body>
-</html>
+
+                        </body>
+                        </html>

@@ -4,10 +4,27 @@
  * and open the template in the editor.
  */
 
+import iot.jcypher.database.DBAccessFactory;
+import iot.jcypher.database.DBProperties;
+import iot.jcypher.database.DBType;
+import iot.jcypher.database.IDBAccess;
+import iot.jcypher.graph.GrNode;
+import iot.jcypher.graph.Graph;
+import iot.jcypher.query.JcQuery;
+import iot.jcypher.query.JcQueryResult;
+import iot.jcypher.query.api.IClause;
+import iot.jcypher.query.factories.clause.CREATE;
+import iot.jcypher.query.factories.clause.MATCH;
+import iot.jcypher.query.factories.clause.RETURN;
+import iot.jcypher.query.result.JcError;
+import iot.jcypher.query.values.JcNode;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -16,7 +33,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
-import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 
@@ -44,7 +60,7 @@ public class InicializacaoUsuarios extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet InicializacaoUsuarios</title>");            
+            out.println("<title>Servlet InicializacaoUsuarios</title>");
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Servlet InicializacaoUsuarios at " + request.getContextPath() + "</h1>");
@@ -67,11 +83,12 @@ public class InicializacaoUsuarios extends HttpServlet {
             throws ServletException, IOException {
         processRequest(request, response);
     }
-    
+
     private enum TipoNo implements Label {
+
         Usuario;
     }
-    
+
     /**
      * Handles the HTTP <code>POST</code> method.
      *
@@ -83,44 +100,75 @@ public class InicializacaoUsuarios extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        GraphDatabaseService graphDb = new GraphDatabaseFactory().newEmbeddedDatabase("graph.db");
-        ExecutionEngine engine = new ExecutionEngine(graphDb);
-        try (Transaction tx = graphDb.beginTx()) {
-            engine.execute("optional match (n:Usuario) optional match (n)-[r]->() delete n,r");
-//          engine.execute("optional match (n:Usuario) optional match (n)<-[r]-() delete n,r");
-//          engine.execute("optional match (n:Pagina) optional match (n)-[r]-() delete n,r");
-            ArrayList<String> nomes = new ArrayList<String>(30);
-            nomes.addAll(Arrays.asList("Melynda","Ima","Dortha","Raina",
-                    "Sharolyn","Colby","Janita","Coleman","Jeanelle","Alicia",
-                    "Valene","Winston","Rebbeca","Sebrina","Desirae","Loura",
-                    "Sherie","Mallie","Tomas","Carolee","Vincenza","Tyesha",
-                    "Rhiannon","Joesph","Tijuana","Lashandra","Gene","Le",
-                    "Shirly","Ulrike"));
+
+        final String SERVER_ROOT_URI = "http://localhost:7474/";
+        final String usernameDB = "neo4j";
+        final String passwdDB = "dba";
+
+        Properties props = new Properties();
+        props.setProperty(DBProperties.SERVER_ROOT_URI, SERVER_ROOT_URI);
+
+        IDBAccess remote
+                = DBAccessFactory.createDBAccess(DBType.REMOTE, props, usernameDB, passwdDB);
+
+        JcNode usuario = new JcNode("Usuario");
+        JcQuery query = new JcQuery();
+
+        final int NUM_USUARIOS = 30;
+        try {
+            query.setClauses(new IClause[]{
+                MATCH.node(usuario).label("Usuario"),
+                RETURN.value(usuario)
+            });
+            JcQueryResult result = remote.execute(query);
+            List<GrNode> usuarios = result.resultOf(usuario);
+            for (Iterator<GrNode> iterator = usuarios.iterator(); iterator.hasNext();) {
+                GrNode next = iterator.next();
+                next.remove();
+            }
+            Graph graph = result.getGraph();
+            List<JcError> errors = graph.store();
+
+            if (result.hasErrors()) {
+                response.sendRedirect("criacao_conta.jsp?msg=falha");
+            }
+
+            ArrayList<String> nomes = new ArrayList<String>(NUM_USUARIOS);
+            nomes.addAll(Arrays.asList("Melynda", "Ima", "Dortha", "Raina",
+                    "Sharolyn", "Colby", "Janita", "Coleman", "Jeanelle", "Alicia",
+                    "Valene", "Winston", "Rebbeca", "Sebrina", "Desirae", "Loura",
+                    "Sherie", "Mallie", "Tomas", "Carolee", "Vincenza", "Tyesha",
+                    "Rhiannon", "Joesph", "Tijuana", "Lashandra", "Gene", "Le",
+                    "Shirly", "Ulrike"));
             ArrayList<String> sobrenomes = new ArrayList<String>(30);
-            
+
             ArrayList<String> genero = new ArrayList<String>(30);
             genero.add("masculino");
             genero.add("feminino");
-            
-            for (int i = 0; i < nomes.size(); i++) {
-                Node usuario = graphDb.createNode(InicializacaoUsuarios.TipoNo.Usuario);
-                usuario.setProperty("id", i);
-                usuario.setProperty("nome", nomes.get(i));
-                usuario.setProperty("sobrenome", "da Silva");              
-                usuario.setProperty("sexo", genero.get(i%2));
-                usuario.setProperty("email", nomes.get(i).toLowerCase()+"@email.com");
-                usuario.setProperty("senha", "senha123");
-                usuario.setProperty("nascimento", "1/1/1");
-                usuario.setProperty("sobre", "Uma pessoa interessante" + i);
-                usuario.setProperty("validado", "sim");
+
+            for (int i = 0; i < NUM_USUARIOS; i++) {
+                query.setClauses(new IClause[]{
+                    CREATE.node(usuario).label("Usuario")
+                    .property("id").value(i)
+                    .property("nome").value(nomes.get(i))
+                    .property("sobrenome").value("da Silva")
+                    .property("sexo").value(genero.get(i % 2))
+                    .property("email").value(nomes.get(i).toLowerCase() + "@email.com")
+                    .property("senha").value("senha123")
+                    .property("nascimento").value("1/1/1")
+                    .property("sobre").value("Uma pessoa interessante" + i)
+                    .property("validado").value("sim")
+                });
+                result = remote.execute(query);
             }
-            tx.success();
-            System.out.println("Rede reiniciada! Todas as pessoas foram inseridas!");
-            response.sendRedirect("redirect.jsp");
+
+            if (result.hasErrors()) {
+                response.sendRedirect("criacao_conta.jsp?msg=falha");
+            }
+        } catch (Exception e) {
+            response.sendRedirect("criacao_conta.jsp?msg=falha");
         }
-        finally {
-            graphDb.shutdown();
-        }
+        response.sendRedirect("busca_pessoas.jsp");
     }
 
     /**
