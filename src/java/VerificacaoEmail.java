@@ -111,17 +111,17 @@ public class VerificacaoEmail extends HttpServlet {
         List<GrNode> listaUsuarios = result.resultOf(usuario);
         String codigoEnviado = listaUsuarios.get(0).getProperty("codigo_enviado").getValue().toString();
         String codigoDigitado = request.getParameter("codigo");
-        String email = CadastroUsuario.getEmailUsuario();
-        if (codigoDigitado.equals(codigoEnviado)) {
+        
+        if (codigoEnviado.equals(codigoDigitado)) {
             JcQuery update = new JcQuery();
             update.setClauses(new IClause[]{
                 DO.SET(usuario.property("validado")).to("sim")
             });
             remote.execute(update);
-            
             response.sendRedirect("pagina_inicial.jsp?msg=" + username);
-        } else {
-            response.sendRedirect("verificacao_email?msg=falha");
+        }
+        else {
+            response.sendRedirect("verificacao_email.jsp?msg=falha");
         }
     }
 

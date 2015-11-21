@@ -8,13 +8,17 @@ import iot.jcypher.database.DBAccessFactory;
 import iot.jcypher.database.DBProperties;
 import iot.jcypher.database.DBType;
 import iot.jcypher.database.IDBAccess;
+import iot.jcypher.graph.GrNode;
 import iot.jcypher.query.JcQuery;
 import iot.jcypher.query.JcQueryResult;
 import iot.jcypher.query.api.IClause;
 import iot.jcypher.query.factories.clause.CREATE;
+import iot.jcypher.query.factories.clause.MATCH;
+import iot.jcypher.query.factories.clause.RETURN;
 import iot.jcypher.query.values.JcNode;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -150,8 +154,41 @@ public class CadastroUsuario extends HttpServlet {
 
             setUsernameUsuario(username);
             setEmailUsuario(email);
-
-            if (senha.equals(copia_senha)) {
+            
+            JcQuery preQuery = new JcQuery();
+            preQuery.setClauses(new IClause[] {
+                MATCH.node(usuario).label("Usuario")
+                .property("username").value(username),
+                RETURN.value(usuario)
+            });
+            boolean existeUsuarioComUsername;
+            try {
+                JcQueryResult r = remote.execute(preQuery);
+                List<GrNode> l = r.resultOf(usuario);
+                GrNode teste = l.get(0);
+                existeUsuarioComUsername = true;
+            }
+            catch (ArrayIndexOutOfBoundsException i) {
+                existeUsuarioComUsername = false; 
+            }
+            preQuery = new JcQuery();
+            preQuery.setClauses(new IClause[] {
+                MATCH.node(usuario).label("Usuario")
+                .property("email").value(email),
+                RETURN.value(usuario)
+            });
+            boolean existeUsuarioComEmail;
+            try {
+                JcQueryResult r = remote.execute(preQuery);
+                List<GrNode> l = r.resultOf(usuario);
+                GrNode teste = l.get(0);
+                existeUsuarioComEmail = true;
+            }
+            catch (ArrayIndexOutOfBoundsException i) {
+                existeUsuarioComEmail = false; 
+            }
+            
+            if (senha.equals(copia_senha) && !existeUsuarioComUsername && !existeUsuarioComEmail) {
                 Properties eProps = new Properties();
                 eProps.put("mail.smtp.host", "smtp.gmail.com");
                 eProps.put("mail.smtp.socketFactory.port", "465");
@@ -199,8 +236,12 @@ public class CadastroUsuario extends HttpServlet {
                 }
 
                 response.sendRedirect("verificacao_email.jsp?msg="+username);
-            } else {
+            } 
+            else if (!senha.equals(copia_senha)) {
                 response.sendRedirect("criacao_conta.jsp?msg=falha");
+            }
+            else if (existeUsuarioComUsername || existeUsuarioComEmail) {
+                response.sendRedirect("criacao_conta.jsp?msg=usuarioExistente");
             }
         } catch (MessagingException mex) {
             response.sendRedirect("criacao_conta.jsp?msg=emailInvalido");

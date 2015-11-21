@@ -101,6 +101,8 @@
                 out.print("<script>alert('O email digitado é inválido!')</script>");
             } else if (request.getParameter("msg") != null && request.getParameter("msg").toString().equals("falhaEnvio")) {
                 out.print("<script>alert('Houve um erro ao enviar o email de verificação. Desculpe-nos pelo transtorno mas refaça o cadastro.')</script>");
+            } else if (request.getParameter("msg") != null && request.getParameter("msg").toString().equals("usuarioExistente")) {
+                out.print("<script>alert('Ja existe algum usuario com esse email ou nome de usuario.')</script>");
             }%>
         <div class="row">
 
