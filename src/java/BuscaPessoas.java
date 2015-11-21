@@ -12,14 +12,12 @@ import iot.jcypher.graph.GrNode;
 import iot.jcypher.query.JcQuery;
 import iot.jcypher.query.JcQueryResult;
 import iot.jcypher.query.api.IClause;
-import iot.jcypher.query.factories.clause.CREATE;
 import iot.jcypher.query.factories.clause.MATCH;
 import iot.jcypher.query.factories.clause.RETURN;
 import iot.jcypher.query.values.JcNode;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Properties;
@@ -29,13 +27,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.neo4j.cypher.javacompat.ExecutionEngine;
-import org.neo4j.cypher.javacompat.ExecutionResult;
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 
 /**
  *
@@ -103,11 +95,9 @@ public class BuscaPessoas extends HttpServlet {
             throws ServletException, IOException {
 
         final String SERVER_ROOT_URI = "http://localhost:7474/";
-
         final String usernameDB = "neo4j";
         final String passwdDB = "dba";
 
-// REFATORACAO CONEXAO SERVIDOR 3
         Properties props = new Properties();
         props.setProperty(DBProperties.SERVER_ROOT_URI, SERVER_ROOT_URI);
 
@@ -166,41 +156,6 @@ public class BuscaPessoas extends HttpServlet {
         } catch (PatternSyntaxException ex) {
             response.sendRedirect("pagina_inicial.jsp");
         }
-//
-//        GraphDatabaseService graphDb = new GraphDatabaseFactory().newEmbeddedDatabase("graph.db");
-//        ExecutionEngine engine = new ExecutionEngine(graphDb);
-//        ExecutionResult result;
-//        String pessoa = request.getParameter("pessoa");
-//        List pessoasEncontradas = new ArrayList();
-//
-//        try (Transaction tx = graphDb.beginTx()) {
-//            result = engine.execute("match (n:Usuario) where n.nome='" + pessoa + "' return n");
-//            Iterator<Node> pessoas = result.columnAs("n");
-//            while (pessoas.hasNext()) {
-//                Node user = pessoas.next();
-//                List encontrou = new ArrayList();
-//                String nome = (String) user.getProperty("nome");
-//                String sobrenome = (String) user.getProperty("sobrenome");
-//                String sobre = (String) user.getProperty("sobre");
-//                encontrou.add(nome);
-//                encontrou.add(sobrenome);
-//                encontrou.add(sobre);
-//                pessoasEncontradas.add(encontrou);
-//            }
-//
-//            request.setAttribute("pessoasEncontradas", pessoasEncontradas);
-//            RequestDispatcher rd = request.getRequestDispatcher("busca_pessoas.jsp");
-//            rd.forward(request, response);
-//            tx.success();
-//
-//        } catch (NullPointerException n) {
-//            response.sendRedirect("pagina_inicial.jsp");
-//        } finally {
-//            graphDb.shutdown();
-//            response.sendRedirect("pagina_inicial.jsp");
-//        }
-
-        //processRequest(request, response);
     }
 
     /**
