@@ -1,9 +1,16 @@
-<%-- 
-    Document   : pagina_inicial
-    Created on : 27/09/2015, 11:14:15
-    Author     : Antonio Mateus
---%>
-
+<%@page import="java.util.List"%>
+<%@page import="java.util.Properties"%>
+<%@page import="iot.jcypher.graph.GrNode"%>
+<%@page import="iot.jcypher.database.DBType"%>
+<%@page import="iot.jcypher.database.DBProperties"%>
+<%@page import="iot.jcypher.database.DBAccessFactory"%>
+<%@page import="iot.jcypher.database.IDBAccess"%>
+<%@page import="iot.jcypher.query.JcQuery"%>
+<%@page import="iot.jcypher.query.JcQueryResult"%>
+<%@page import="iot.jcypher.query.factories.clause.RETURN"%>
+<%@page import="iot.jcypher.query.values.JcNode"%>
+<%@page import="iot.jcypher.query.api.IClause"%>
+<%@page import="iot.jcypher.query.factories.clause.MATCH"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -56,8 +63,10 @@
         <link rel="shortcut icon" href="frienterest.ico">
     </head>
     <body>
+        
+        
         <!-- Busca -->
-
+        
         <nav class="top-bar" data-topbar role="navigation">
             <form method="POST" action="BuscaPessoas">
                 <ul class="title-area">
@@ -134,7 +143,36 @@
     </nav>
 
     <!-- Busca - Fim -->
-    <% //String[] nomeSexo = request.getParameter("msg").toString().split("_"); ARRUMAR ISSO!
+    <% String SERVER_ROOT_URI = "http://localhost:7474/";
+        String usernameDB = "neo4j";
+        String passwdDB = "dba";
+        Properties props = new Properties();
+        props.setProperty(DBProperties.SERVER_ROOT_URI, SERVER_ROOT_URI);
+        IDBAccess remote = DBAccessFactory.createDBAccess(DBType.REMOTE, props, usernameDB, passwdDB);
+        JcNode usuario = new JcNode("Usuario");
+        JcQuery query = new JcQuery();
+        String nomeUsuario = request.getParameter("msg").toString();
+        query.setClauses(new IClause[]{
+            MATCH.node(usuario).label("Usuario").property("username").value(nomeUsuario),
+            RETURN.value(usuario)
+        });
+        JcQueryResult resultado = remote.execute(query);
+        if (resultado.hasErrors()) { %>
+            <h1><%out.println("Deu ruim");%></h1>
+        <% }
+       
+        List<GrNode> usuarios = resultado.resultOf(usuario);
+        String nome = (String) usuarios.get(0).getProperty("nome").getValue();
+        String genero = (String) usuarios.get(0).getProperty("genero").getValue();
+        String artigo;
+        if (genero.equals("null")) 
+            artigo = "o";
+        else if (genero.equals("masculino"))
+            artigo = "o";
+        else 
+            artigo = "a";
+        String mensagem = "Seja bem vind" +artigo +" " +nome;
+//String[] nomeSexo = request.getParameter("msg").toString().split("_"); ARRUMAR ISSO!
 //        String nome = ControleLogin.getEmailLogado();
 //        String artigo;
 //        if (nome==null) {
@@ -152,7 +190,7 @@
 //        else 
 //            artigo = "a";
 //        String mensagem = "Seja bem vind" +artigo +" " +nome; %>
-    <h1> <% out.println("Bem-vinde!"); %> </h1>
+    <h1> <% out.println(mensagem); %> </h1>
     <br>
     <!--        <div id="alchemy" class="alchemy" align="center">
                 <script type="text/javascript" src="js/vendor/vendor.js"></script>
