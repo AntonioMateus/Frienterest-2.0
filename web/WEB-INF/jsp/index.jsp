@@ -242,9 +242,7 @@
             </div>
 
             <div class="small-12 medium-3 large-4 columns">
-                <i class="fi-torso-business"></i>
                 <form action="InicializacaoUsuarios" method="post">
-                    <i class="fi-torso-business"></i> 
                     <input type="submit" value="" class="imgClass">
                 </form> 
 
