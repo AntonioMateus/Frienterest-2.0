@@ -4,11 +4,26 @@
  * and open the template in the editor.
  */
 
+import iot.jcypher.database.DBAccessFactory;
+import iot.jcypher.database.DBProperties;
+import iot.jcypher.database.DBType;
+import iot.jcypher.database.IDBAccess;
+import iot.jcypher.graph.GrNode;
+import iot.jcypher.query.JcQuery;
+import iot.jcypher.query.JcQueryResult;
+import iot.jcypher.query.api.IClause;
+import iot.jcypher.query.factories.clause.CREATE;
+import iot.jcypher.query.factories.clause.MATCH;
+import iot.jcypher.query.factories.clause.RETURN;
+import iot.jcypher.query.values.JcNode;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Properties;
+import java.util.regex.PatternSyntaxException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -70,7 +85,6 @@ public class BuscaPessoas extends HttpServlet {
     }
 
     //Se for a primeira vez que você está executando esse projeto, descomente as linhas a seguir
-
     public enum TipoNo implements Label {
 
         Usuario;
@@ -87,38 +101,104 @@ public class BuscaPessoas extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        GraphDatabaseService graphDb = new GraphDatabaseFactory().newEmbeddedDatabase("graph.db");
-        ExecutionEngine engine = new ExecutionEngine(graphDb);
-        ExecutionResult result;
+
+        final String SERVER_ROOT_URI = "http://localhost:7474/";
+
+        final String usernameDB = "neo4j";
+        final String passwdDB = "dba";
+
+// REFATORACAO CONEXAO SERVIDOR 3
+        Properties props = new Properties();
+        props.setProperty(DBProperties.SERVER_ROOT_URI, SERVER_ROOT_URI);
+
+        IDBAccess remote
+                = DBAccessFactory.createDBAccess(DBType.REMOTE, props, usernameDB, passwdDB);
+
+        JcNode usuario = new JcNode("Usuario");
+        JcQuery query = new JcQuery();
+
         String pessoa = request.getParameter("pessoa");
         List pessoasEncontradas = new ArrayList();
 
-        try (Transaction tx = graphDb.beginTx()) {
-            result = engine.execute("match (n:Usuario) where n.nome='" + pessoa + "' return n");
-            Iterator<Node> pessoas = result.columnAs("n");
-            while (pessoas.hasNext()) {
-                Node user = pessoas.next();
+        try {
+            String[] nomeSobrenome = pessoa.split("\\s+");
+
+            if (nomeSobrenome.length == 1) {
+                query.setClauses(new IClause[]{
+                    MATCH.node(usuario).label("Usuario")
+                    .property("nome").value(nomeSobrenome[0]),
+                    RETURN.value(usuario)
+                });
+            } else if (nomeSobrenome.length == 2) {
+                query.setClauses(new IClause[]{
+                    MATCH.node(usuario).label("Usuario")
+                    .property("nome").value(nomeSobrenome[0])
+                    .property("sobrenome").value(nomeSobrenome[1]),
+                    RETURN.value(usuario)
+                });
+            }
+
+            JcQueryResult result = remote.execute(query);
+
+            if (result.hasErrors()) {
+                response.sendRedirect("criacao_conta.jsp?msg=falha");
+            }
+
+            List<GrNode> pessoas = result.resultOf(usuario);
+            ListIterator<GrNode> itPessoas = pessoas.listIterator();
+            
+            while (itPessoas.hasNext()) {
+                GrNode user = itPessoas.next();
                 List encontrou = new ArrayList();
-                String nome = (String) user.getProperty("nome");
-                String sobrenome = (String) user.getProperty("sobrenome");
-                String sobre = (String) user.getProperty("sobre");
+                String nome = (String) user.getProperty("nome").getValue().toString();
+                String sobrenome = (String) user.getProperty("sobrenome").getValue().toString();
+                String sobre = (String) user.getProperty("sobre").getValue().toString();
                 encontrou.add(nome);
                 encontrou.add(sobrenome);
                 encontrou.add(sobre);
                 pessoasEncontradas.add(encontrou);
             }
-            
+
             request.setAttribute("pessoasEncontradas", pessoasEncontradas);
             RequestDispatcher rd = request.getRequestDispatcher("busca_pessoas.jsp");
             rd.forward(request, response);
-            tx.success();
             
-        } catch (NullPointerException n) {
-            response.sendRedirect("pagina_inicial.jsp");
-        } finally {
-            graphDb.shutdown();
+        } catch (PatternSyntaxException ex) {
             response.sendRedirect("pagina_inicial.jsp");
         }
+//
+//        GraphDatabaseService graphDb = new GraphDatabaseFactory().newEmbeddedDatabase("graph.db");
+//        ExecutionEngine engine = new ExecutionEngine(graphDb);
+//        ExecutionResult result;
+//        String pessoa = request.getParameter("pessoa");
+//        List pessoasEncontradas = new ArrayList();
+//
+//        try (Transaction tx = graphDb.beginTx()) {
+//            result = engine.execute("match (n:Usuario) where n.nome='" + pessoa + "' return n");
+//            Iterator<Node> pessoas = result.columnAs("n");
+//            while (pessoas.hasNext()) {
+//                Node user = pessoas.next();
+//                List encontrou = new ArrayList();
+//                String nome = (String) user.getProperty("nome");
+//                String sobrenome = (String) user.getProperty("sobrenome");
+//                String sobre = (String) user.getProperty("sobre");
+//                encontrou.add(nome);
+//                encontrou.add(sobrenome);
+//                encontrou.add(sobre);
+//                pessoasEncontradas.add(encontrou);
+//            }
+//
+//            request.setAttribute("pessoasEncontradas", pessoasEncontradas);
+//            RequestDispatcher rd = request.getRequestDispatcher("busca_pessoas.jsp");
+//            rd.forward(request, response);
+//            tx.success();
+//
+//        } catch (NullPointerException n) {
+//            response.sendRedirect("pagina_inicial.jsp");
+//        } finally {
+//            graphDb.shutdown();
+//            response.sendRedirect("pagina_inicial.jsp");
+//        }
 
         //processRequest(request, response);
     }
