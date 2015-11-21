@@ -78,7 +78,6 @@ public class BuscaPessoas extends HttpServlet {
 
     //Se for a primeira vez que você está executando esse projeto, descomente as linhas a seguir
     public enum TipoNo implements Label {
-
         Usuario;
     }
 
