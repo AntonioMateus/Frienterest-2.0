@@ -96,29 +96,24 @@ public class VerificacaoEmail extends HttpServlet {
                 = DBAccessFactory.createDBAccess(DBType.REMOTE, props, usernameDB, passwdDB);
 
         JcNode usuario = new JcNode("Usuario");
+        String username = ControleLogin.getUsernameLogado();
         JcQuery query = new JcQuery();
-        JcQuery update = new JcQuery();
-        
-        String username = CadastroUsuario.getUsernameUsuario();
-
-        String codigoEnviado = CadastroUsuario.getCodigoVerificacao();
+        query.setClauses(new IClause[]{
+            MATCH.node(usuario).label("Usuario")
+            .property("username").value(username),
+            RETURN.value(usuario)
+        });
+        JcQueryResult result = remote.execute(query);
+        if (result.hasErrors()) {
+            response.sendRedirect("criacao_conta.jsp?msg=falha");
+            return;
+        }
+        List<GrNode> listaUsuarios = result.resultOf(usuario);
+        String codigoEnviado = listaUsuarios.get(0).getProperty("codigo_enviado").getValue().toString();
         String codigoDigitado = request.getParameter("codigo");
         String email = CadastroUsuario.getEmailUsuario();
         if (codigoDigitado.equals(codigoEnviado)) {
-            
-            /* ARRUMAR */
-            
-            query.setClauses(new IClause[]{
-                MATCH.node(usuario).label("Usuario")
-                .property("username").value(username),
-                RETURN.value(usuario)
-            });
-            JcQueryResult result = remote.execute(query);
-            if (result.hasErrors()) {
-                response.sendRedirect("criacao_conta.jsp?msg=falha");
-            }
-            
-
+            JcQuery update = new JcQuery();
             update.setClauses(new IClause[]{
                 DO.SET(usuario.property("validado")).to("sim")
             });
@@ -126,7 +121,7 @@ public class VerificacaoEmail extends HttpServlet {
             
             response.sendRedirect("pagina_inicial.jsp?msg=" + username);
         } else {
-
+            response.sendRedirect("verificacao_email?msg=falha");
         }
     }
 

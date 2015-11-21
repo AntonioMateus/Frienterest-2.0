@@ -190,6 +190,7 @@ public class CadastroUsuario extends HttpServlet {
                     .property("genero").value(genero)
                     .property("sobre").value(sobre)
                     .property("validado").value("nao")
+                    .property("codigo_enviado").value(codigo)
                 });
                 JcQueryResult result = remote.execute(query);
 
@@ -197,7 +198,7 @@ public class CadastroUsuario extends HttpServlet {
                     response.sendRedirect("criacao_conta.jsp?msg=falha");
                 }
 
-                response.sendRedirect("verificacao_email.jsp");
+                response.sendRedirect("verificacao_email.jsp?msg="+username);
             } else {
                 response.sendRedirect("criacao_conta.jsp?msg=falha");
             }

@@ -220,7 +220,7 @@ public class CadastroPagina extends HttpServlet {
                 Node interesse = colunas.next();
                 pagina.createRelationshipTo(interesse, TipoRelacionamento.PossuiPalavraChave);
             }
-            String emailCriador = ControleLogin.getEmailLogado();
+            String emailCriador = ControleLogin.getUsernameLogado();
             if (emailCriador == null) {
                 emailCriador = CadastroUsuario.getEmailUsuario(); 
             }

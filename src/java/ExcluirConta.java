@@ -75,7 +75,7 @@ public class ExcluirConta extends HttpServlet {
             throws ServletException, IOException {
         GraphDatabaseService graphDb = new GraphDatabaseFactory().newEmbeddedDatabase("graph.db");
         ExecutionEngine engine = new ExecutionEngine(graphDb);
-        String email = ControleLogin.getEmailLogado();
+        String email = ControleLogin.getUsernameLogado();
         try (Transaction tx = graphDb.beginTx()){
             engine.execute("match (n:Usuario) where n.email='"+email+"' optional match (n)-[r]->() delete n,r");
             tx.success();

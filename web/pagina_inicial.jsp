@@ -151,27 +151,33 @@
         IDBAccess remote = DBAccessFactory.createDBAccess(DBType.REMOTE, props, usernameDB, passwdDB);
         JcNode usuario = new JcNode("Usuario");
         JcQuery query = new JcQuery();
-        String nomeUsuario = request.getParameter("msg").toString();
-        query.setClauses(new IClause[]{
-            MATCH.node(usuario).label("Usuario").property("username").value(nomeUsuario),
-            RETURN.value(usuario)
-        });
-        JcQueryResult resultado = remote.execute(query);
-        if (resultado.hasErrors()) { %>
-            <h1><%out.println("Deu ruim");%></h1>
-        <% }
-       
-        List<GrNode> usuarios = resultado.resultOf(usuario);
-        String nome = (String) usuarios.get(0).getProperty("nome").getValue();
-        String genero = (String) usuarios.get(0).getProperty("genero").getValue();
-        String artigo;
-        if (genero.equals("null")) 
-            artigo = "o";
-        else if (genero.equals("masculino"))
-            artigo = "o";
-        else 
-            artigo = "a";
-        String mensagem = "Seja bem vind" +artigo +" " +nome;
+        String mensagem; 
+        try {
+            String nomeUsuario = request.getParameter("msg").toString();
+            query.setClauses(new IClause[]{
+                MATCH.node(usuario).label("Usuario").property("username").value(nomeUsuario),
+                RETURN.value(usuario)
+            });
+            JcQueryResult resultado = remote.execute(query);
+            if (resultado.hasErrors()) { %>
+                <h1><%out.println("Deu ruim");%></h1>
+            <% }
+
+            List<GrNode> usuarios = resultado.resultOf(usuario);
+            String nome = (String) usuarios.get(0).getProperty("nome").getValue();
+            String genero = (String) usuarios.get(0).getProperty("genero").getValue();
+            String artigo;
+            if (genero.equals("null")) 
+                artigo = "o";
+            else if (genero.equals("masculino"))
+                artigo = "o";
+            else 
+                artigo = "a";
+            mensagem = "Seja bem vind" +artigo +" " +nome;
+        }
+        catch (NullPointerException e) {
+            mensagem = "Seja bem vindo";
+        }
 //String[] nomeSexo = request.getParameter("msg").toString().split("_"); ARRUMAR ISSO!
 //        String nome = ControleLogin.getEmailLogado();
 //        String artigo;

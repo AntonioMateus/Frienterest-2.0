@@ -33,10 +33,14 @@ import iot.jcypher.query.values.JcNode;
  */
 public class ControleLogin extends HttpServlet {
 
-    public static String emailLogado;
+    public static String usernameLogado;
 
-    public static String getEmailLogado() {
-        return emailLogado;
+    public static String getUsernameLogado() {
+        return usernameLogado;
+    }
+    
+    public static void setUsernameLogado(String user) {
+        usernameLogado = user;
     }
 
     /**
@@ -98,13 +102,13 @@ public class ControleLogin extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String email = request.getParameter("email");
-        emailLogado = email;
+        String username = request.getParameter("username");
+        usernameLogado = username;
         String senha_digitada = request.getParameter("senha");
 
         final String SERVER_ROOT_URI = "http://localhost:7474/";
 
-        final String username = "neo4j";
+        final String user = "neo4j";
         final String passwd = "dba";
         
 // REFATORACAO CONEXAO SERVIDOR 3
@@ -112,12 +116,12 @@ public class ControleLogin extends HttpServlet {
         props.setProperty(DBProperties.SERVER_ROOT_URI, SERVER_ROOT_URI);
 
         IDBAccess remote
-                = DBAccessFactory.createDBAccess(DBType.REMOTE, props, username, passwd);
+                = DBAccessFactory.createDBAccess(DBType.REMOTE, props, user, passwd);
 
         JcNode usuario = new JcNode("Usuario");
         JcQuery query = new JcQuery();
         query.setClauses(new IClause[]{
-            MATCH.node(usuario).label("Usuario").property("email").value(email),
+            MATCH.node(usuario).label("Usuario").property("username").value(username),
             RETURN.value(usuario)
         });
         JcQueryResult result = remote.execute(query);
@@ -126,15 +130,13 @@ public class ControleLogin extends HttpServlet {
         GrNode usuarioLogin = usuarios.get(0);
         String senhaUsuario = usuarioLogin.getProperty("senha").getValue().toString();
         String validacaoUsuario = usuarioLogin.getProperty("validado").getValue().toString();
-        String nomeUsuario = usuarioLogin.getProperty("nome").getValue().toString();
         
         if (senha_digitada.equals(senhaUsuario)) {
             if(validacaoUsuario.equals("sim")){
-                response.sendRedirect("pagina_inicial.jsp?msg=" + nomeUsuario);   
+                response.sendRedirect("pagina_inicial.jsp?msg=" + username);   
             }
-        } else if (senha_digitada.equals(senhaUsuario)) {
-            if(validacaoUsuario.equals("nao")){
-                response.sendRedirect("verificacao_email.jsp");   
+            else {
+                response.sendRedirect("verificacao_email.jsp");
             }
         } else {
             response.sendRedirect("redirect.jsp?msg=true");

@@ -131,6 +131,8 @@
         <link rel="shortcut icon" href="frienterest.ico">
     </head>
     <body>
+        <% if (request.getParameter("msg") != null && request.getParameter("msg").toString().equals("falha")) {
+        out.print ("<script>alert('O codigo enviado por nos eh diferente do digitado ! Por favor, tente novamente !')</script>"); }%>
         <div id="intro" class="row full-width">
 
             <div class="small-6 medium-1 large-2 columns auth-plain">

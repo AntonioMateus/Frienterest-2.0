@@ -179,7 +179,7 @@
 
                             <div class="small-10  columns">
 
-                                <input type="text" name="email" size="40" placeholder="Email">
+                                <input type="text" name="username" size="40" placeholder="Nome de usuario">
 
                             </div>
 
