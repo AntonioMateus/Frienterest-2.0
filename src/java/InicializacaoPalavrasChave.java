@@ -128,12 +128,10 @@ public class InicializacaoPalavrasChave extends HttpServlet {
             }
 
             ArrayList<String> interesses = new ArrayList<String>(NUM_PALAVRAS);
-            interesses.addAll(Arrays.asList("Esportes", "Politica", "Educacao", "Meio_ambiente",
-                    "Informatica", "Cinema", "Teatro", "Psicologia", "Curiosidades", "Humor",
-                    "Saude", "Economia", "Noticias", "Marketing", "Musicas", "Games",
-                    "Viagem", "Literatura", "Animais", "Serie_televisao", "Serie_livros", "Musculacao",
-                    "Filosofia", "Sociologia", "Estatistica", "Ciencia", "Religiao", "Futebol",
-                    "Crossfit", "Kirby"));
+            interesses.addAll(Arrays.asList("esportes", "politica", "educacao", "meio_ambiente",
+                    "informatica", "cinema", "teatro", "psicologia", "curiosidades", "humor",
+                    "saude", "economia", "noticias", "marketing", "musicas", "games",
+                    "viagem", "literatura", "animais", "series_televisao"));
             
             for (int i = 0; i < NUM_PALAVRAS; i++) {
                 query.setClauses(new IClause[]{

@@ -152,6 +152,9 @@
                 out.print("<script>alert('Senha incorreta ! Por favor, tente novamente !')</script>");
             } else if (request.getParameter("msg") != null && request.getParameter("msg").toString().equals("false")) {
                 out.print("<script>alert('Usuário não cadastrado ! Inscreva-se agora mesmo !')</script>");
+            }
+            else if (request.getParameter("msg") != null && request.getParameter("msg").toString().equals("sucesso")) {
+                out.print("<script>alert('Conta removida com sucesso. Sentiremos a sua falta !')</script>");
             }%>        
         <div id="intro" class="row full-width">
 

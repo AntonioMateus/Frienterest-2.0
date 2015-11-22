@@ -4,8 +4,23 @@
  * and open the template in the editor.
  */
 
+import iot.jcypher.database.DBAccessFactory;
+import iot.jcypher.database.DBProperties;
+import iot.jcypher.database.DBType;
+import iot.jcypher.database.IDBAccess;
+import iot.jcypher.graph.GrNode;
+import iot.jcypher.graph.Graph;
+import iot.jcypher.query.JcQuery;
+import iot.jcypher.query.JcQueryResult;
+import iot.jcypher.query.api.IClause;
+import iot.jcypher.query.factories.clause.MATCH;
+import iot.jcypher.query.factories.clause.RETURN;
+import iot.jcypher.query.result.JcError;
+import iot.jcypher.query.values.JcNode;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
+import java.util.Properties;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -73,17 +88,31 @@ public class ExcluirConta extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        GraphDatabaseService graphDb = new GraphDatabaseFactory().newEmbeddedDatabase("graph.db");
-        ExecutionEngine engine = new ExecutionEngine(graphDb);
-        String email = ControleLogin.getUsernameLogado();
-        try (Transaction tx = graphDb.beginTx()){
-            engine.execute("match (n:Usuario) where n.email='"+email+"' optional match (n)-[r]->() delete n,r");
-            tx.success();
-            response.sendRedirect("redirect.jsp");
-        }            
-        finally {
-            graphDb.shutdown();
+        final String SERVER_ROOT_URI = "http://localhost:7474/";
+        final String user = "neo4j";
+        final String passwd = "dba";
+        Properties props = new Properties();
+        props.setProperty(DBProperties.SERVER_ROOT_URI, SERVER_ROOT_URI);
+        IDBAccess remote
+                = DBAccessFactory.createDBAccess(DBType.REMOTE, props, user, passwd);
+
+        String username = ControleLogin.getUsernameLogado();
+        JcNode usuario = new JcNode("Usuario");
+        JcQuery exclusao = new JcQuery();
+        exclusao.setClauses(new IClause[]{
+            MATCH.node(usuario).label("Usuario").property("username").value(username),
+            RETURN.value(usuario)
+        });
+        JcQueryResult resultado = remote.execute(exclusao);
+        List<GrNode> usuarios = resultado.resultOf(usuario);
+        GrNode usuarioAExcluir = usuarios.get(0);
+        usuarioAExcluir.remove();
+        Graph grafo = resultado.getGraph();
+        List<JcError> erros = grafo.store();
+        if (!erros.isEmpty()) {
+            System.out.println("Houve erros na remocao");
         }
+        response.sendRedirect("redirect.jsp?msg=sucesso");
     }
 
     /**

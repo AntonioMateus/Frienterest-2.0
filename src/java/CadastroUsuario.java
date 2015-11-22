@@ -151,97 +151,99 @@ public class CadastroUsuario extends HttpServlet {
             String dataNasc = request.getParameter("data_nascimento");
             String genero = request.getParameter("genero");
             String sobre = request.getParameter("sobre");
+                
+            if (copia_senha.equals(senha)) {
+                setUsernameUsuario(username);
+                setEmailUsuario(email);
 
-            setUsernameUsuario(username);
-            setEmailUsuario(email);
-            
-            JcQuery preQuery = new JcQuery();
-            preQuery.setClauses(new IClause[] {
-                MATCH.node(usuario).label("Usuario")
-                .property("username").value(username),
-                RETURN.value(usuario)
-            });
-            boolean existeUsuarioComUsername;
-            try {
-                JcQueryResult r = remote.execute(preQuery);
-                List<GrNode> l = r.resultOf(usuario);
-                GrNode teste = l.get(0);
-                existeUsuarioComUsername = true;
-            }
-            catch (IndexOutOfBoundsException i) {
-                existeUsuarioComUsername = false; 
-            }
-            preQuery = new JcQuery();
-            preQuery.setClauses(new IClause[] {
-                MATCH.node(usuario).label("Usuario")
-                .property("email").value(email),
-                RETURN.value(usuario)
-            });
-            boolean existeUsuarioComEmail;
-            try {
-                JcQueryResult r = remote.execute(preQuery);
-                List<GrNode> l = r.resultOf(usuario);
-                GrNode teste = l.get(0);
-                existeUsuarioComEmail = true;
-            }
-            catch (IndexOutOfBoundsException i) {
-                existeUsuarioComEmail = false; 
-            }
-            
-            if (senha.equals(copia_senha) && !existeUsuarioComUsername && !existeUsuarioComEmail) {
-                Properties eProps = new Properties();
-                eProps.put("mail.smtp.host", "smtp.gmail.com");
-                eProps.put("mail.smtp.socketFactory.port", "465");
-                eProps.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-                eProps.put("mail.smtp.auth", "true");
-                eProps.put("mail.smtp.port", "465");
-                Session session = Session.getInstance(eProps,
-                        new javax.mail.Authenticator() {
-                            @Override
-                            protected PasswordAuthentication getPasswordAuthentication() {
-                                return new PasswordAuthentication("equipefrienterest@gmail.com", "frien27terest");
-                            }
-                        });
-                session.setDebug(true);
-                Message message = new MimeMessage(session);
-                message.setFrom(new InternetAddress("equipefrienterest@gmail.com"));
-                Address[] destinatarios = InternetAddress.parse(email);
-                message.setRecipients(Message.RecipientType.TO, destinatarios);
-                String artigo = (genero.equals("masculino") ? "o" : "a");
-                String assunto = "Bem vind" + artigo + " ao Frienterest";
-                message.setSubject(assunto);
-                String codigo = String.valueOf((int) (java.lang.Math.random() * 8999 + 1000));
-                setCodigoVerificacao(codigo);
-                String mensagem = "Olá " + nome + ", tudo bem?\nSeja bem vind" + artigo + " ao Frienterest: uma rede de pessoas interessantes. \nPor favor, use o código " + codigo + " quando for necessário.\nAtenciosamente.\nEquipe Frienterest";
-                message.setText(mensagem);
-                Transport.send(message);
-
-                query.setClauses(new IClause[]{
-                    CREATE.node(usuario).label("Usuario")
-                    .property("nome").value(nome)
-                    .property("sobrenome").value(sobrenome)
-                    .property("username").value(username)
-                    .property("email").value(email)
-                    .property("senha").value(senha)
-                    .property("data_nascimento").value(dataNasc)
-                    .property("genero").value(genero)
-                    .property("sobre").value(sobre)
-                    .property("validado").value("nao")
-                    .property("codigo_enviado").value(codigo)
+                JcQuery preQuery = new JcQuery();
+                preQuery.setClauses(new IClause[] {
+                    MATCH.node(usuario).label("Usuario")
+                    .property("username").value(username),
+                    RETURN.value(usuario)
                 });
-                JcQueryResult result = remote.execute(query);
-
-                if (result.hasErrors()) {
-                    response.sendRedirect("criacao_conta.jsp?msg=falha");
+                boolean existeUsuarioComUsername;
+                try {
+                    JcQueryResult r = remote.execute(preQuery);
+                    List<GrNode> l = r.resultOf(usuario);
+                    GrNode teste = l.get(0);
+                    existeUsuarioComUsername = true;
+                }
+                catch (IndexOutOfBoundsException i) {
+                    existeUsuarioComUsername = false; 
+                }
+                preQuery = new JcQuery();
+                preQuery.setClauses(new IClause[] {
+                    MATCH.node(usuario).label("Usuario")
+                    .property("email").value(email),
+                    RETURN.value(usuario)
+                });
+                boolean existeUsuarioComEmail;
+                try {
+                    JcQueryResult r = remote.execute(preQuery);
+                    List<GrNode> l = r.resultOf(usuario);
+                    GrNode teste = l.get(0);
+                    existeUsuarioComEmail = true;
+                }
+                catch (IndexOutOfBoundsException i) {
+                    existeUsuarioComEmail = false; 
                 }
 
-                response.sendRedirect("verificacao_email.jsp?msg="+username);
-            } 
-            else if (!senha.equals(copia_senha)) {
-                response.sendRedirect("criacao_conta.jsp?msg=falha");
+                if (!existeUsuarioComUsername && !existeUsuarioComEmail) {
+                    Properties eProps = new Properties();
+                    eProps.put("mail.smtp.host", "smtp.gmail.com");
+                    eProps.put("mail.smtp.socketFactory.port", "465");
+                    eProps.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+                    eProps.put("mail.smtp.auth", "true");
+                    eProps.put("mail.smtp.port", "465");
+                    Session session = Session.getInstance(eProps,
+                            new javax.mail.Authenticator() {
+                                @Override
+                                protected PasswordAuthentication getPasswordAuthentication() {
+                                    return new PasswordAuthentication("equipefrienterest@gmail.com", "frien27terest");
+                                }
+                            });
+                    session.setDebug(true);
+                    Message message = new MimeMessage(session);
+                    message.setFrom(new InternetAddress("equipefrienterest@gmail.com"));
+                    Address[] destinatarios = InternetAddress.parse(email);
+                    message.setRecipients(Message.RecipientType.TO, destinatarios);
+                    String artigo = (genero.equals("masculino") ? "o" : "a");
+                    String assunto = "Bem vind" + artigo + " ao Frienterest";
+                    message.setSubject(assunto);
+                    String codigo = String.valueOf((int) (java.lang.Math.random() * 8999 + 1000));
+                    setCodigoVerificacao(codigo);
+                    String mensagem = "Olá " + nome + ", tudo bem?\nSeja bem vind" + artigo + " ao Frienterest: uma rede de pessoas interessantes. \nPor favor, use o código " + codigo + " quando for necessário.\nAtenciosamente.\nEquipe Frienterest";
+                    message.setText(mensagem);
+                    Transport.send(message);
+
+                    query.setClauses(new IClause[]{
+                        CREATE.node(usuario).label("Usuario")
+                        .property("nome").value(nome)
+                        .property("sobrenome").value(sobrenome)
+                        .property("username").value(username)
+                        .property("email").value(email)
+                        .property("senha").value(senha)
+                        .property("data_nascimento").value(dataNasc)
+                        .property("genero").value(genero)
+                        .property("sobre").value(sobre)
+                        .property("validado").value("nao")
+                        .property("codigo_enviado").value(codigo)
+                    });
+                    JcQueryResult result = remote.execute(query);
+
+                    if (result.hasErrors()) {
+                        response.sendRedirect("criacao_conta.jsp?msg=falha");
+                    }
+
+                    response.sendRedirect("verificacao_email.jsp?msg="+username);
+                }            
+                else if (existeUsuarioComUsername || existeUsuarioComEmail) {
+                    response.sendRedirect("criacao_conta.jsp?msg=usuarioExistente");
+                }
             }
-            else if (existeUsuarioComUsername || existeUsuarioComEmail) {
-                response.sendRedirect("criacao_conta.jsp?msg=usuarioExistente");
+            else {
+                response.sendRedirect("criacao_conta.jsp?msg=falha");
             }
         } catch (MessagingException mex) {
             response.sendRedirect("criacao_conta.jsp?msg=emailInvalido");

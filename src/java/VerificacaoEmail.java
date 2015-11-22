@@ -120,6 +120,7 @@ public class VerificacaoEmail extends HttpServlet {
                 DO.SET(usuario.property("validado")).to("sim")
             });
             remote.execute(update);
+            ControleLogin.setUsernameLogado(username);
             response.sendRedirect("pagina_inicial.jsp?msg=" + username);
         }
         else {

@@ -124,21 +124,26 @@ public class ControleLogin extends HttpServlet {
             RETURN.value(usuario)
         });
         JcQueryResult result = remote.execute(query);
-        List<GrNode> usuarios = result.resultOf(usuario);
+        try {
+            List<GrNode> usuarios = result.resultOf(usuario);
 
-        GrNode usuarioLogin = usuarios.get(0);
-        String senhaUsuario = usuarioLogin.getProperty("senha").getValue().toString();
-        String validacaoUsuario = usuarioLogin.getProperty("validado").getValue().toString();
-        
-        if (senha_digitada.equals(senhaUsuario)) {
-            if(validacaoUsuario.equals("sim")){
-                response.sendRedirect("pagina_inicial.jsp?msg=" + username);   
+            GrNode usuarioLogin = usuarios.get(0);
+            String senhaUsuario = usuarioLogin.getProperty("senha").getValue().toString();
+            String validacaoUsuario = usuarioLogin.getProperty("validado").getValue().toString();
+
+            if (senha_digitada.equals(senhaUsuario)) {
+                if(validacaoUsuario.equals("sim")){
+                    response.sendRedirect("pagina_inicial.jsp?msg=" + username);   
+                }
+                else {
+                    response.sendRedirect("verificacao_email.jsp");
+                }
+            } else {
+                response.sendRedirect("redirect.jsp?msg=true");
             }
-            else {
-                response.sendRedirect("verificacao_email.jsp");
-            }
-        } else {
-            response.sendRedirect("redirect.jsp?msg=true");
+        }
+        catch (NullPointerException | IndexOutOfBoundsException n) {
+            response.sendRedirect("redirect.jsp?msg=false");
         }
     }
 
