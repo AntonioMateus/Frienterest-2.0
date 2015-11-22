@@ -18,6 +18,9 @@ else if (request.getParameter("msg") != null && request.getParameter("msg").toSt
 else if (request.getParameter("msg") != null && request.getParameter("msg").toString().equals("sucesso")) {
     response.sendRedirect("index.htm?msg=sucesso");
 }
+else if (request.getParameter("msg") != null && request.getParameter("msg").toString().equals("exclusaoIncorreta")) {
+    response.sendRedirect("index.htm?msg=exclusaoIncorreta");
+}
 else {
     response.sendRedirect("index.htm?msg=false");
 } %>

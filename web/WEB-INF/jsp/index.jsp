@@ -122,7 +122,7 @@
 
             }
 
-            .imgClass1 {
+            .imgClass {
                 background-image: url(http://i.imgur.com/sFE359B.jpg?1);
                 background-position: 0px 0px; 
                 background-repeat: no-repeat;
@@ -131,18 +131,8 @@
                 border: 0px;
                 cursor: pointer;
                 outline: 0;                
-            }
+            }         
             
-            .imgClass2 {
-                background-image: url(http://i.imgur.com/9qJ4xgQ.png?1);
-                background-position: 0px 0px; 
-                background-repeat: no-repeat;
-                width: 66px;
-                height: 78px;
-                border: 0px;
-                cursor: pointer;
-                outline: 0;                
-            }
 
         </style> 
         <link rel="shortcut icon" href="frienterest.ico">
@@ -155,6 +145,9 @@
             }
             else if (request.getParameter("msg") != null && request.getParameter("msg").toString().equals("sucesso")) {
                 out.print("<script>alert('Conta removida com sucesso. Sentiremos a sua falta !')</script>");
+            }
+            else if (request.getParameter("msg") != null && request.getParameter("msg").toString().equals("exclusaoIncorreta")) {
+                out.print("<script>alert('Problemas ao repopular o banco de dados')</script>");
             }%>        
         <div id="intro" class="row full-width">
 
@@ -245,8 +238,8 @@
         <div class="row full-width">
 
             <div class="small-12 medium-3 large-4 columns">    
-                <form action="InicializacaoPalavrasChave" method="post">
-                    <input type="submit" value="" class="imgClass1">
+                <form action="InicializacaoBancoDados" method="post">
+                    <input type="submit" value="" class="imgClass">
                 </form> 
 
                 <p>Inicialmente, a rede social Frienterest está disponível apenas para web. Trata-se de uma rede que usa uma nova tecnologia para armazenar dados de pessoas, bem como relacionamentos entre elas! Ficou curioso(a)? Inscreva-se hoje mesmo! </p>
@@ -254,9 +247,7 @@
             </div>
 
             <div class="small-12 medium-3 large-4 columns">
-                <form action="InicializacaoUsuarios" method="post">
-                    <input type="submit" value="" class="imgClass2">
-                </form>              
+                <i class="fi-torso-business"></i>              
 
                 <p>Os desenvolvedores desse projeto são Antonio Carlos Mateus da Silva e André Thomaz Gandolpho de Mello, ambos estudantes de Sistemas de Informação da EACH-USP.</p>
 

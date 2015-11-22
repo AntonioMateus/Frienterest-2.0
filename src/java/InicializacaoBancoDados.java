@@ -14,7 +14,9 @@ import iot.jcypher.query.JcQuery;
 import iot.jcypher.query.JcQueryResult;
 import iot.jcypher.query.api.IClause;
 import iot.jcypher.query.factories.clause.CREATE;
+import iot.jcypher.query.factories.clause.DO;
 import iot.jcypher.query.factories.clause.MATCH;
+import iot.jcypher.query.factories.clause.OPTIONAL_MATCH;
 import iot.jcypher.query.factories.clause.RETURN;
 import iot.jcypher.query.result.JcError;
 import iot.jcypher.query.values.JcNode;
@@ -36,8 +38,8 @@ import org.neo4j.graphdb.Label;
  *
  * @author Antonio Mateus
  */
-@WebServlet(urlPatterns = {"/InicializacaoPalavrasChave"})
-public class InicializacaoPalavrasChave extends HttpServlet {
+@WebServlet(urlPatterns = {"/InicializacaoBancoDados"})
+public class InicializacaoBancoDados extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -106,49 +108,82 @@ public class InicializacaoPalavrasChave extends HttpServlet {
                 = DBAccessFactory.createDBAccess(DBType.REMOTE, props, usernameDB, passwdDB);
 
         JcNode palavraChave = new JcNode("PalavraChave");
-        JcQuery query = new JcQuery();
-
-        final int NUM_PALAVRAS = 30;
+        JcNode usuario = new JcNode("Usuario");
+        final int NUM_PALAVRAS = 20;
+        final int NUM_USUARIOS = 30;
         try {
-            query.setClauses(new IClause[]{
-                MATCH.node(palavraChave).label("PalavraChave"),
-                RETURN.value(palavraChave)
-            });
-            JcQueryResult result = remote.execute(query);
-            List<GrNode> usuarios = result.resultOf(palavraChave);
-            for (Iterator<GrNode> iterator = usuarios.iterator(); iterator.hasNext();) {
-                GrNode next = iterator.next();
-                next.remove();
+            JcQueryResult result;
+            List<JcError> errors = remote.clearDatabase();
+            if (!errors.isEmpty()) {
+                System.out.println("Houve erro ao excluir as palavras-chave");
             }
-            Graph graph = result.getGraph();
-            List<JcError> errors = graph.store();
-
-            if (result.hasErrors()) {
-                response.sendRedirect("criacao_conta.jsp?msg=falha");
-            }
-
-            ArrayList<String> interesses = new ArrayList<String>(NUM_PALAVRAS);
-            interesses.addAll(Arrays.asList("esportes", "politica", "educacao", "meio_ambiente",
+            else {
+                ArrayList<String> interesses = new ArrayList<String>(NUM_PALAVRAS);
+                interesses.addAll(Arrays.asList("esportes", "politica", "educacao", "meio_ambiente",
                     "informatica", "cinema", "teatro", "psicologia", "curiosidades", "humor",
                     "saude", "economia", "noticias", "marketing", "musicas", "games",
                     "viagem", "literatura", "animais", "series_televisao"));
-            
-            for (int i = 0; i < NUM_PALAVRAS; i++) {
-                query.setClauses(new IClause[]{
-                    CREATE.node(palavraChave).label("PalavraChave")
-                    .property("id").value(i)
-                    .property("nome").value(interesses.get(i))
-                });
-                result = remote.execute(query);
-            }
+                int i;
+                for (i = 0; i < NUM_PALAVRAS; i++) {
+                    JcQuery criacaoPalavras = new JcQuery();
+                    criacaoPalavras.setClauses(new IClause[]{
+                        CREATE.node(palavraChave).label("PalavraChave")
+                        .property("id").value(""+(i+1))
+                        .property("nome").value(interesses.get(i))
+                    });
+                    result = remote.execute(criacaoPalavras);
+                    if (result.hasErrors()) {
+                        break;
+                    }
+                }
+                if (i < NUM_PALAVRAS) {
+                    System.out.println("Houve erro ao criar as palvras-chave");
+                }
+                
+                ArrayList<String> nomes = new ArrayList<String>(NUM_USUARIOS);
+                nomes.addAll(Arrays.asList("Le", "Ima", "Dortha", "Raina",
+                    "Sharolyn", "Colby", "Janita", "Coleman", "Jeanelle", "Alicia",
+                    "Valene", "Winston", "Rebbeca", "Sebrina", "Desirae", "Loura",
+                    "Sherie", "Mallie", "Tomas", "Carolee", "Vincenza", "Tyesha",
+                    "Rhiannon", "Joesph", "Tijuana", "Lashandra", "Gene", "Melynda",
+                    "Shirly", "Ulrike"));
+                ArrayList<String> sobrenomes = new ArrayList<String>(30);
 
-            if (result.hasErrors()) {
-                response.sendRedirect("criacao_conta.jsp?msg=falha");
+                ArrayList<String> genero = new ArrayList<String>(30);
+                genero.add("masculino");
+                genero.add("feminino");
+                
+                int j;
+                for (j = 0; j < NUM_USUARIOS; j++) {
+                    JcQuery query = new JcQuery();
+                    query.setClauses(new IClause[]{
+                        CREATE.node(usuario).label("Usuario")
+                        .property("id").value(j)
+                        .property("nome").value(nomes.get(j))
+                        .property("sobrenome").value("da Silva")
+                        .property("username").value(nomes.get(j).toLowerCase() + "_frienterestUser" + j)
+                        .property("sexo").value(genero.get(j % 2))
+                        .property("email").value(nomes.get(j).toLowerCase() + "@email.com")
+                        .property("senha").value("senha123")
+                        .property("nascimento").value("1/1/1")
+                        .property("sobre").value("Uma pessoa interessante" + j)
+                        .property("validado").value("sim")
+                    });
+                    result = remote.execute(query);
+                    if (result.hasErrors()) {
+                        break;
+                    }
+                }
+                
+                if (j < NUM_USUARIOS){
+                    System.out.println("Houve erros durante a criacao dos usuarios");
+                }                
             }
+            response.sendRedirect("redirect.jsp");
         } catch (Exception e) {
-            response.sendRedirect("criacao_conta.jsp?msg=falha");
+            response.sendRedirect("redirect.jsp?msg=exclusaoIncorreta");
         }
-        response.sendRedirect("redirect.jsp");
+        
     }
 
     /**
