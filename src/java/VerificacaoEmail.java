@@ -9,7 +9,6 @@ import iot.jcypher.database.DBProperties;
 import iot.jcypher.database.DBType;
 import iot.jcypher.database.IDBAccess;
 import iot.jcypher.graph.GrNode;
-import iot.jcypher.graph.Graph;
 import iot.jcypher.query.JcQuery;
 import iot.jcypher.query.JcQueryResult;
 import iot.jcypher.query.api.IClause;

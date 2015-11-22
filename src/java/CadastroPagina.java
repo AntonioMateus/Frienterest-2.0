@@ -15,20 +15,11 @@ import iot.jcypher.query.factories.clause.MATCH;
 import iot.jcypher.query.values.JcNode;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Iterator;
 import java.util.Properties;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.neo4j.cypher.javacompat.ExecutionEngine;
-import org.neo4j.cypher.javacompat.ExecutionResult;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Label;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.RelationshipType;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 
 /**
  *
@@ -77,13 +68,6 @@ public class CadastroPagina extends HttpServlet {
         processRequest(request, response);
     }
 
-    private enum TipoNo implements Label {
-        Pagina;
-    }
-    
-    private enum TipoRelacionamento implements RelationshipType {
-        PossuiPalavraChave, CriaPagina;
-    }
     /**
      * Handles the HTTP <code>POST</code> method.
      *
@@ -106,9 +90,6 @@ public class CadastroPagina extends HttpServlet {
         IDBAccess remote
                 = DBAccessFactory.createDBAccess(DBType.REMOTE, props, user, passwd);
 
-        /*GraphDatabaseService graphDb = new GraphDatabaseFactory().newEmbeddedDatabase("graph.db");
-        ExecutionEngine engine = new ExecutionEngine(graphDb);
-        ExecutionResult result;*/
         String nomePagina = request.getParameter("nome");
         String descricao = request.getParameter("sobre");
         
