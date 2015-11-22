@@ -157,7 +157,7 @@
             <form method="post" action="VerificacaoEmail" >
                 <div class="row collapse">
                     <div class="small-3 columns">
-                        <input type="text" placeholder="digite o código de verificação" name="codigo">
+                        <input type="password" placeholder="digite o código de verificação" name="codigo">
                     </div>
                 </div>                
                 <input type="submit" value="Enviar código" class="button">                   

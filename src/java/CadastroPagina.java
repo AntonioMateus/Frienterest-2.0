@@ -127,7 +127,7 @@ public class CadastroPagina extends HttpServlet {
             relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
                 MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
                 MATCH.node(palavraChave).label("PalavraChave").property("nome").value("esportes"),
-                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+                CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
         }
@@ -136,7 +136,7 @@ public class CadastroPagina extends HttpServlet {
             relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
                 MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
                 MATCH.node(palavraChave).label("PalavraChave").property("nome").value("politica"),
-                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+                CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
         }
@@ -145,7 +145,7 @@ public class CadastroPagina extends HttpServlet {
             relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
                 MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
                 MATCH.node(palavraChave).label("PalavraChave").property("nome").value("educacao"),
-                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+                CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
         }
@@ -154,7 +154,7 @@ public class CadastroPagina extends HttpServlet {
             relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
                 MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
                 MATCH.node(palavraChave).label("PalavraChave").property("nome").value("meio_ambiente"),
-                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+                CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
         }
@@ -163,7 +163,7 @@ public class CadastroPagina extends HttpServlet {
             relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
                 MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
                 MATCH.node(palavraChave).label("PalavraChave").property("nome").value("informatica"),
-                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+                CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
         }
@@ -172,7 +172,7 @@ public class CadastroPagina extends HttpServlet {
             relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
                 MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
                 MATCH.node(palavraChave).label("PalavraChave").property("nome").value("cinema"),
-                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+                CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
         }
@@ -181,7 +181,7 @@ public class CadastroPagina extends HttpServlet {
             relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
                 MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
                 MATCH.node(palavraChave).label("PalavraChave").property("nome").value("teatro"),
-                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+                CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
         }
@@ -190,7 +190,7 @@ public class CadastroPagina extends HttpServlet {
             relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
                 MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
                 MATCH.node(palavraChave).label("PalavraChave").property("nome").value("psicologia"),
-                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+                CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
         }
@@ -199,7 +199,7 @@ public class CadastroPagina extends HttpServlet {
             relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
                 MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
                 MATCH.node(palavraChave).label("PalavraChave").property("nome").value("curiosidades"),
-                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+                CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
         }
@@ -208,7 +208,7 @@ public class CadastroPagina extends HttpServlet {
             relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
                 MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
                 MATCH.node(palavraChave).label("PalavraChave").property("nome").value("humor"),
-                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+                CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
         }
@@ -217,7 +217,7 @@ public class CadastroPagina extends HttpServlet {
             relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
                 MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
                 MATCH.node(palavraChave).label("PalavraChave").property("nome").value("saude"),
-                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+                CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
         }
@@ -226,7 +226,7 @@ public class CadastroPagina extends HttpServlet {
             relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
                 MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
                 MATCH.node(palavraChave).label("PalavraChave").property("nome").value("economia"),
-                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+                CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
         }
@@ -235,7 +235,7 @@ public class CadastroPagina extends HttpServlet {
             relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
                 MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
                 MATCH.node(palavraChave).label("PalavraChave").property("nome").value("noticias"),
-                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+                CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
         }
@@ -244,7 +244,7 @@ public class CadastroPagina extends HttpServlet {
             relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
                 MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
                 MATCH.node(palavraChave).label("PalavraChave").property("nome").value("marketing"),
-                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+                CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
         }
@@ -253,7 +253,7 @@ public class CadastroPagina extends HttpServlet {
             relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
                 MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
                 MATCH.node(palavraChave).label("PalavraChave").property("nome").value("musica"),
-                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+                CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
         }
@@ -262,7 +262,7 @@ public class CadastroPagina extends HttpServlet {
             relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
                 MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
                 MATCH.node(palavraChave).label("PalavraChave").property("nome").value("games"),
-                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+                CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
         }
@@ -271,7 +271,7 @@ public class CadastroPagina extends HttpServlet {
             relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
                 MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
                 MATCH.node(palavraChave).label("PalavraChave").property("nome").value("viagem"),
-                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+                CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
         }
@@ -280,7 +280,7 @@ public class CadastroPagina extends HttpServlet {
             relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
                 MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
                 MATCH.node(palavraChave).label("PalavraChave").property("nome").value("literatura"),
-                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+                CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
         }
@@ -289,7 +289,7 @@ public class CadastroPagina extends HttpServlet {
             relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
                 MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
                 MATCH.node(palavraChave).label("PalavraChave").property("nome").value("animais"),
-                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+                CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
         }
@@ -298,7 +298,7 @@ public class CadastroPagina extends HttpServlet {
             relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
                 MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
                 MATCH.node(palavraChave).label("PalavraChave").property("nome").value("series_televisao"),
-                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+                CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
         }
@@ -308,7 +308,7 @@ public class CadastroPagina extends HttpServlet {
         correspondenciaPaginaCriador.setClauses(new IClause[]{
             MATCH.node(criador).label("Usuario").property("username").value(usernameCriador),
             MATCH.node(pagina).label("Pagina"),
-            CREATE.node(criador).relation().type("CriaPagina").node(pagina)
+            CREATE.node(criador).relation().out().type("CriaPagina").node(pagina)
         });
         response.sendRedirect("pagina_generica.jsp?msg="+nomePagina+"_"+descricao);
     }

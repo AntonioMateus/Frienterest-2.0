@@ -177,25 +177,7 @@
             mensagem = "Seja bem vind" + artigo + " " + nome;
         } catch (NullPointerException e) {
             mensagem = "Seja bem vindo";
-        }
-//String[] nomeSexo = request.getParameter("msg").toString().split("_"); ARRUMAR ISSO!
-//        String nome = ControleLogin.getEmailLogado();
-//        String artigo;
-//        if (nome==null) {
-//            nome = CadastroUsuario.getNomeUsuario();
-//        }
-//        String sexo = CadastroUsuario.getSexoUsuario();
-//        if (sexo==null) {
-//            sexo = "masculino";
-//        }
-//         
-//        if (sexo.equals("null")) 
-//            artigo = "o";
-//        else if (sexo.equals("masculino")) 
-//            artigo = "o";
-//        else 
-//            artigo = "a";
-//        String mensagem = "Seja bem vind" +artigo +" " +nome; %>
+        } %>
     <h1> <% out.println(mensagem); %> </h1>
     <br>
     <!--        <div id="alchemy" class="alchemy" align="center">
