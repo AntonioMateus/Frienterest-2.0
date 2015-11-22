@@ -115,6 +115,8 @@ public class VerificacaoEmail extends HttpServlet {
         if (codigoEnviado.equals(codigoDigitado)) {
             JcQuery update = new JcQuery();
             update.setClauses(new IClause[]{
+                MATCH.node(usuario).label("Usuario")
+                .property("username").value(username),
                 DO.SET(usuario.property("validado")).to("sim")
             });
             remote.execute(update);

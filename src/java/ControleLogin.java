@@ -111,7 +111,6 @@ public class ControleLogin extends HttpServlet {
         final String user = "neo4j";
         final String passwd = "dba";
         
-// REFATORACAO CONEXAO SERVIDOR 3
         Properties props = new Properties();
         props.setProperty(DBProperties.SERVER_ROOT_URI, SERVER_ROOT_URI);
 

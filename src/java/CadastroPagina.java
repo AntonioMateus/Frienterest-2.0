@@ -4,9 +4,19 @@
  * and open the template in the editor.
  */
 
+import iot.jcypher.database.DBAccessFactory;
+import iot.jcypher.database.DBProperties;
+import iot.jcypher.database.DBType;
+import iot.jcypher.database.IDBAccess;
+import iot.jcypher.query.JcQuery;
+import iot.jcypher.query.api.IClause;
+import iot.jcypher.query.factories.clause.CREATE;
+import iot.jcypher.query.factories.clause.MATCH;
+import iot.jcypher.query.values.JcNode;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Iterator;
+import java.util.Properties;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -85,156 +95,222 @@ public class CadastroPagina extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        GraphDatabaseService graphDb = new GraphDatabaseFactory().newEmbeddedDatabase("graph.db");
+        final String SERVER_ROOT_URI = "http://localhost:7474/";
+
+        final String user = "neo4j";
+        final String passwd = "dba";
+        
+        Properties props = new Properties();
+        props.setProperty(DBProperties.SERVER_ROOT_URI, SERVER_ROOT_URI);
+
+        IDBAccess remote
+                = DBAccessFactory.createDBAccess(DBType.REMOTE, props, user, passwd);
+
+        /*GraphDatabaseService graphDb = new GraphDatabaseFactory().newEmbeddedDatabase("graph.db");
         ExecutionEngine engine = new ExecutionEngine(graphDb);
-        ExecutionResult result;
-        try (Transaction tx = graphDb.beginTx()) {
-            String nomePagina = request.getParameter("nome");
-            String descricao = request.getParameter("sobre"); 
-            Node pagina = graphDb.createNode(TipoNo.Pagina);
-            pagina.setProperty("nome", nomePagina);
-            pagina.setProperty("descricao",descricao);
-            if (request.getParameter("esportes") != null) {
-                result = engine.execute("match (int:PalavraChave {nome:'esportes'}) return int");
-                Iterator<Node> colunas = result.columnAs("int");
-                Node interesse = colunas.next();
-                pagina.createRelationshipTo(interesse, TipoRelacionamento.PossuiPalavraChave);
-            }
-            if (request.getParameter("politica") != null) {
-                result = engine.execute("match (int:PalavraChave {nome:'politica'}) return int");
-                Iterator<Node> colunas = result.columnAs("int");
-                Node interesse = colunas.next();
-                pagina.createRelationshipTo(interesse, TipoRelacionamento.PossuiPalavraChave);
-            }
-            if (request.getParameter("educacao") != null) {
-                result = engine.execute("match (int:PalavraChave {nome:'educacao'}) return int");
-                Iterator<Node> colunas = result.columnAs("int");
-                Node interesse = colunas.next();
-                pagina.createRelationshipTo(interesse, TipoRelacionamento.PossuiPalavraChave);
-            }
-            if (request.getParameter("meio_ambiente") != null) {
-                result = engine.execute("match (int:PalavraChave {nome:'meio_ambiente'}) return int");
-                Iterator<Node> colunas = result.columnAs("int");
-                Node interesse = colunas.next();
-                pagina.createRelationshipTo(interesse, TipoRelacionamento.PossuiPalavraChave);
-            }
-            if (request.getParameter("informatica") != null) {
-                result = engine.execute("match (int:PalavraChave {nome:'informatica'}) return int");
-                Iterator<Node> colunas = result.columnAs("int");
-                Node interesse = colunas.next();
-                pagina.createRelationshipTo(interesse, TipoRelacionamento.PossuiPalavraChave);
-            }
-            if (request.getParameter("cinema") != null) {
-                result = engine.execute("match (int:PalavraChave {nome:'cinema'}) return int");
-                Iterator<Node> colunas = result.columnAs("int");
-                Node interesse = colunas.next();
-                pagina.createRelationshipTo(interesse, TipoRelacionamento.PossuiPalavraChave);
-            }
-            if (request.getParameter("teatro") != null) {
-                result = engine.execute("match (int:PalavraChave {nome:'teatro'}) return int");
-                Iterator<Node> colunas = result.columnAs("int");
-                Node interesse = colunas.next();
-                pagina.createRelationshipTo(interesse, TipoRelacionamento.PossuiPalavraChave);
-            }
-            if (request.getParameter("psicologia") != null) {
-                result = engine.execute("match (int:PalavraChave {nome:'psicologia'}) return int");
-                Iterator<Node> colunas = result.columnAs("int");
-                Node interesse = colunas.next();
-                pagina.createRelationshipTo(interesse, TipoRelacionamento.PossuiPalavraChave);
-            }
-            if (request.getParameter("curiosidades") != null) {
-                result = engine.execute("match (int:PalavraChave {nome:'curiosidades'}) return int");
-                Iterator<Node> colunas = result.columnAs("int");
-                Node interesse = colunas.next();
-                pagina.createRelationshipTo(interesse, TipoRelacionamento.PossuiPalavraChave);
-            }
-            if (request.getParameter("humor") != null) {
-                result = engine.execute("match (int:PalavraChave {nome:'humor'}) return int");
-                Iterator<Node> colunas = result.columnAs("int");
-                Node interesse = colunas.next();
-                pagina.createRelationshipTo(interesse, TipoRelacionamento.PossuiPalavraChave);
-            }
-            if (request.getParameter("saude") != null) {
-                result = engine.execute("match (int:PalavraChave {nome:'saude'}) return int");
-                Iterator<Node> colunas = result.columnAs("int");
-                Node interesse = colunas.next();
-                pagina.createRelationshipTo(interesse, TipoRelacionamento.PossuiPalavraChave);
-            }
-            if (request.getParameter("economia") != null) {
-                result = engine.execute("match (int:PalavraChave {nome:'economia'}) return int");
-                Iterator<Node> colunas = result.columnAs("int");
-                Node interesse = colunas.next();
-                pagina.createRelationshipTo(interesse, TipoRelacionamento.PossuiPalavraChave);
-            }
-            if (request.getParameter("economia") != null) {
-                result = engine.execute("match (int:PalavraChave {nome:'economia'}) return int");
-                Iterator<Node> colunas = result.columnAs("int");
-                Node interesse = colunas.next();
-                pagina.createRelationshipTo(interesse, TipoRelacionamento.PossuiPalavraChave);
-            }
-            if (request.getParameter("noticias") != null) {
-                result = engine.execute("match (int:PalavraChave {nome:'noticias'}) return int");
-                Iterator<Node> colunas = result.columnAs("int");
-                Node interesse = colunas.next();
-                pagina.createRelationshipTo(interesse, TipoRelacionamento.PossuiPalavraChave);
-            }
-            if (request.getParameter("marketing") != null) {
-                result = engine.execute("match (int:PalavraChave {nome:'marketing'}) return int");
-                Iterator<Node> colunas = result.columnAs("int");
-                Node interesse = colunas.next();
-                pagina.createRelationshipTo(interesse, TipoRelacionamento.PossuiPalavraChave);
-            }
-            if (request.getParameter("musica") != null) {
-                result = engine.execute("match (int:PalavraChave {nome:'musica'}) return int");
-                Iterator<Node> colunas = result.columnAs("int");
-                Node interesse = colunas.next();
-                pagina.createRelationshipTo(interesse, TipoRelacionamento.PossuiPalavraChave);
-            }
-            if (request.getParameter("games") != null) {
-                result = engine.execute("match (int:PalavraChave {nome:'games'}) return int");
-                Iterator<Node> colunas = result.columnAs("int");
-                Node interesse = colunas.next();
-                pagina.createRelationshipTo(interesse, TipoRelacionamento.PossuiPalavraChave);
-            }
-            if (request.getParameter("viagem") != null) {
-                result = engine.execute("match (int:PalavraChave {nome:'viagem'}) return int");
-                Iterator<Node> colunas = result.columnAs("int");
-                Node interesse = colunas.next();
-                pagina.createRelationshipTo(interesse, TipoRelacionamento.PossuiPalavraChave);
-            }
-            if (request.getParameter("literatura") != null) {
-                result = engine.execute("match (int:PalavraChave {nome:'literatura'}) return int");
-                Iterator<Node> colunas = result.columnAs("int");
-                Node interesse = colunas.next();
-                pagina.createRelationshipTo(interesse, TipoRelacionamento.PossuiPalavraChave);
-            }
-            if (request.getParameter("animais") != null) {
-                result = engine.execute("match (int:PalavraChave {nome:'animais'}) return int");
-                Iterator<Node> colunas = result.columnAs("int");
-                Node interesse = colunas.next();
-                pagina.createRelationshipTo(interesse, TipoRelacionamento.PossuiPalavraChave);
-            }
-            if (request.getParameter("series_televisao") != null) {
-                result = engine.execute("match (int:PalavraChave {nome:'series_televisao'}) return int");
-                Iterator<Node> colunas = result.columnAs("int");
-                Node interesse = colunas.next();
-                pagina.createRelationshipTo(interesse, TipoRelacionamento.PossuiPalavraChave);
-            }
-            String emailCriador = ControleLogin.getUsernameLogado();
-            if (emailCriador == null) {
-                emailCriador = CadastroUsuario.getEmailUsuario(); 
-            }
-            String consulta = "match (criador:Usuario {email: '" +emailCriador +"'}) return criador";
-            result = engine.execute(consulta);
-            Iterator<Node> colunas = result.columnAs("criador");
-            Node criador = colunas.next();
-            criador.createRelationshipTo(pagina, TipoRelacionamento.CriaPagina);
-            tx.success();
-            response.sendRedirect("pagina_generica.jsp?msg="+nomePagina+"_"+descricao);
+        ExecutionResult result;*/
+        String nomePagina = request.getParameter("nome");
+        String descricao = request.getParameter("sobre");
+        
+        JcNode pagina = new JcNode("Pagina");
+        JcQuery criacaoPagina = new JcQuery();
+        criacaoPagina.setClauses(new IClause[] {
+            CREATE.node(pagina).label("Pagina")
+            .property("nome").value(nomePagina)
+            .property("descricao").value(descricao)
+        });
+        remote.execute(criacaoPagina);
+        JcQuery relacionamentoPaginaPalavraChave;
+        JcNode palavraChave = new JcNode("PalavraChave");
+        if (request.getParameter("esportes") != null) {
+            relacionamentoPaginaPalavraChave = new JcQuery();
+            relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
+                MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
+                MATCH.node(palavraChave).label("PalavraChave").property("nome").value("esportes"),
+                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+            });
+            remote.execute(relacionamentoPaginaPalavraChave);
         }
-        finally {
-            graphDb.shutdown();            
+        if (request.getParameter("politica") != null) {
+            relacionamentoPaginaPalavraChave = new JcQuery();
+            relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
+                MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
+                MATCH.node(palavraChave).label("PalavraChave").property("nome").value("politica"),
+                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+            });
+            remote.execute(relacionamentoPaginaPalavraChave);
         }
+        if (request.getParameter("educacao") != null) {
+            relacionamentoPaginaPalavraChave = new JcQuery();
+            relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
+                MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
+                MATCH.node(palavraChave).label("PalavraChave").property("nome").value("educacao"),
+                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+            });
+            remote.execute(relacionamentoPaginaPalavraChave);
+        }
+        if (request.getParameter("meio_ambiente") != null) {
+            relacionamentoPaginaPalavraChave = new JcQuery();
+            relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
+                MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
+                MATCH.node(palavraChave).label("PalavraChave").property("nome").value("meio_ambiente"),
+                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+            });
+            remote.execute(relacionamentoPaginaPalavraChave);
+        }
+        if (request.getParameter("informatica") != null) {
+            relacionamentoPaginaPalavraChave = new JcQuery();
+            relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
+                MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
+                MATCH.node(palavraChave).label("PalavraChave").property("nome").value("informatica"),
+                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+            });
+            remote.execute(relacionamentoPaginaPalavraChave);
+        }
+        if (request.getParameter("cinema") != null) {
+            relacionamentoPaginaPalavraChave = new JcQuery();
+            relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
+                MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
+                MATCH.node(palavraChave).label("PalavraChave").property("nome").value("cinema"),
+                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+            });
+            remote.execute(relacionamentoPaginaPalavraChave);
+        }
+        if (request.getParameter("teatro") != null) {
+            relacionamentoPaginaPalavraChave = new JcQuery();
+            relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
+                MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
+                MATCH.node(palavraChave).label("PalavraChave").property("nome").value("teatro"),
+                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+            });
+            remote.execute(relacionamentoPaginaPalavraChave);
+        }
+        if (request.getParameter("psicologia") != null) {
+            relacionamentoPaginaPalavraChave = new JcQuery();
+            relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
+                MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
+                MATCH.node(palavraChave).label("PalavraChave").property("nome").value("psicologia"),
+                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+            });
+            remote.execute(relacionamentoPaginaPalavraChave);
+        }
+        if (request.getParameter("curiosidades") != null) {
+            relacionamentoPaginaPalavraChave = new JcQuery();
+            relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
+                MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
+                MATCH.node(palavraChave).label("PalavraChave").property("nome").value("curiosidades"),
+                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+            });
+            remote.execute(relacionamentoPaginaPalavraChave);
+        }
+        if (request.getParameter("humor") != null) {
+            relacionamentoPaginaPalavraChave = new JcQuery();
+            relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
+                MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
+                MATCH.node(palavraChave).label("PalavraChave").property("nome").value("humor"),
+                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+            });
+            remote.execute(relacionamentoPaginaPalavraChave);
+        }
+        if (request.getParameter("saude") != null) {
+            relacionamentoPaginaPalavraChave = new JcQuery();
+            relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
+                MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
+                MATCH.node(palavraChave).label("PalavraChave").property("nome").value("saude"),
+                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+            });
+            remote.execute(relacionamentoPaginaPalavraChave);
+        }
+        if (request.getParameter("economia") != null) {
+            relacionamentoPaginaPalavraChave = new JcQuery();
+            relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
+                MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
+                MATCH.node(palavraChave).label("PalavraChave").property("nome").value("economia"),
+                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+            });
+            remote.execute(relacionamentoPaginaPalavraChave);
+        }
+        if (request.getParameter("noticias") != null) {
+            relacionamentoPaginaPalavraChave = new JcQuery();
+            relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
+                MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
+                MATCH.node(palavraChave).label("PalavraChave").property("nome").value("noticias"),
+                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+            });
+            remote.execute(relacionamentoPaginaPalavraChave);
+        }
+        if (request.getParameter("marketing") != null) {
+            relacionamentoPaginaPalavraChave = new JcQuery();
+            relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
+                MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
+                MATCH.node(palavraChave).label("PalavraChave").property("nome").value("marketing"),
+                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+            });
+            remote.execute(relacionamentoPaginaPalavraChave);
+        }
+        if (request.getParameter("musica") != null) {
+            relacionamentoPaginaPalavraChave = new JcQuery();
+            relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
+                MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
+                MATCH.node(palavraChave).label("PalavraChave").property("nome").value("musica"),
+                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+            });
+            remote.execute(relacionamentoPaginaPalavraChave);
+        }
+        if (request.getParameter("games") != null) {
+            relacionamentoPaginaPalavraChave = new JcQuery();
+            relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
+                MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
+                MATCH.node(palavraChave).label("PalavraChave").property("nome").value("games"),
+                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+            });
+            remote.execute(relacionamentoPaginaPalavraChave);
+        }
+        if (request.getParameter("viagem") != null) {
+            relacionamentoPaginaPalavraChave = new JcQuery();
+            relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
+                MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
+                MATCH.node(palavraChave).label("PalavraChave").property("nome").value("viagem"),
+                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+            });
+            remote.execute(relacionamentoPaginaPalavraChave);
+        }
+        if (request.getParameter("literatura") != null) {
+            relacionamentoPaginaPalavraChave = new JcQuery();
+            relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
+                MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
+                MATCH.node(palavraChave).label("PalavraChave").property("nome").value("literatura"),
+                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+            });
+            remote.execute(relacionamentoPaginaPalavraChave);
+        }
+        if (request.getParameter("animais") != null) {
+            relacionamentoPaginaPalavraChave = new JcQuery();
+            relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
+                MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
+                MATCH.node(palavraChave).label("PalavraChave").property("nome").value("animais"),
+                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+            });
+            remote.execute(relacionamentoPaginaPalavraChave);
+        }
+        if (request.getParameter("series_televisao") != null) {
+            relacionamentoPaginaPalavraChave = new JcQuery();
+            relacionamentoPaginaPalavraChave.setClauses(new IClause[] {
+                MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
+                MATCH.node(palavraChave).label("PalavraChave").property("nome").value("series_televisao"),
+                CREATE.node(pagina).relation().type("PossuiPalavraChave").node(palavraChave)
+            });
+            remote.execute(relacionamentoPaginaPalavraChave);
+        }
+        String usernameCriador = ControleLogin.getUsernameLogado();
+        JcQuery correspondenciaPaginaCriador = new JcQuery();
+        JcNode criador = new JcNode("Usuario");
+        correspondenciaPaginaCriador.setClauses(new IClause[]{
+            MATCH.node(criador).label("Usuario").property("username").value(usernameCriador),
+            MATCH.node(pagina).label("Pagina"),
+            CREATE.node(criador).relation().type("CriaPagina").node(pagina)
+        });
+        response.sendRedirect("pagina_generica.jsp?msg="+nomePagina+"_"+descricao);
     }
 
     /**

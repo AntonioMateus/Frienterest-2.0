@@ -168,7 +168,7 @@ public class CadastroUsuario extends HttpServlet {
                 GrNode teste = l.get(0);
                 existeUsuarioComUsername = true;
             }
-            catch (ArrayIndexOutOfBoundsException i) {
+            catch (IndexOutOfBoundsException i) {
                 existeUsuarioComUsername = false; 
             }
             preQuery = new JcQuery();
@@ -184,7 +184,7 @@ public class CadastroUsuario extends HttpServlet {
                 GrNode teste = l.get(0);
                 existeUsuarioComEmail = true;
             }
-            catch (ArrayIndexOutOfBoundsException i) {
+            catch (IndexOutOfBoundsException i) {
                 existeUsuarioComEmail = false; 
             }
             
