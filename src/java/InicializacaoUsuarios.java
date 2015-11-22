@@ -134,11 +134,11 @@ public class InicializacaoUsuarios extends HttpServlet {
             }
 
             ArrayList<String> nomes = new ArrayList<String>(NUM_USUARIOS);
-            nomes.addAll(Arrays.asList("Melynda", "Ima", "Dortha", "Raina",
+            nomes.addAll(Arrays.asList("Le", "Ima", "Dortha", "Raina",
                     "Sharolyn", "Colby", "Janita", "Coleman", "Jeanelle", "Alicia",
                     "Valene", "Winston", "Rebbeca", "Sebrina", "Desirae", "Loura",
                     "Sherie", "Mallie", "Tomas", "Carolee", "Vincenza", "Tyesha",
-                    "Rhiannon", "Joesph", "Tijuana", "Lashandra", "Gene", "Le",
+                    "Rhiannon", "Joesph", "Tijuana", "Lashandra", "Gene", "Melynda",
                     "Shirly", "Ulrike"));
             ArrayList<String> sobrenomes = new ArrayList<String>(30);
 
@@ -152,6 +152,7 @@ public class InicializacaoUsuarios extends HttpServlet {
                     .property("id").value(i)
                     .property("nome").value(nomes.get(i))
                     .property("sobrenome").value("da Silva")
+                    .property("username").value(nomes.get(i).toLowerCase() + "_frienterestUser" + i)
                     .property("sexo").value(genero.get(i % 2))
                     .property("email").value(nomes.get(i).toLowerCase() + "@email.com")
                     .property("senha").value("senha123")
