@@ -230,12 +230,10 @@
 
         <div class="row full-width">
 
-            <div class="small-12 medium-3 large-4 columns">
-                <i class="fi-laptop"></i>        
-                <!-- <form action="InicializacaoPalavrasChave" method="post">
-                <!-- <i class="fi-laptop"></i> 
-                <input type="submit" value="" class="imgClass">
-            </form> -->
+            <div class="small-12 medium-3 large-4 columns">    
+                <form action="InicializacaoPalavrasChave" method="post">
+                    <input type="submit" value="" class="imgClass">
+                </form> 
 
                 <p>Inicialmente, a rede social Frienterest está disponível apenas para web. Trata-se de uma rede que usa uma nova tecnologia para armazenar dados de pessoas, bem como relacionamentos entre elas! Ficou curioso(a)? Inscreva-se hoje mesmo! </p>
 
