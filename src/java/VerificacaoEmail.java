@@ -96,6 +96,7 @@ public class VerificacaoEmail extends HttpServlet {
 
         JcNode usuario = new JcNode("Usuario");
         String username = ControleLogin.getUsernameLogado();
+        
         JcQuery query = new JcQuery();
         query.setClauses(new IClause[]{
             MATCH.node(usuario).label("Usuario")
@@ -104,7 +105,7 @@ public class VerificacaoEmail extends HttpServlet {
         });
         JcQueryResult result = remote.execute(query);
         if (result.hasErrors()) {
-            response.sendRedirect("criacao_conta.jsp?msg=falha");
+            System.out.println("Houve erro durante a obtencao do usuario logado");
             return;
         }
         List<GrNode> listaUsuarios = result.resultOf(usuario);
@@ -119,7 +120,6 @@ public class VerificacaoEmail extends HttpServlet {
                 DO.SET(usuario.property("validado")).to("sim")
             });
             remote.execute(update);
-            ControleLogin.setUsernameLogado(username);
             response.sendRedirect("pagina_inicial.jsp?msg=" + username);
         }
         else {

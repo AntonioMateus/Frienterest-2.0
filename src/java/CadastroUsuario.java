@@ -190,6 +190,27 @@ public class CadastroUsuario extends HttpServlet {
                 }
 
                 if (!existeUsuarioComUsername && !existeUsuarioComEmail) {
+                    String codigo = String.valueOf((int) (java.lang.Math.random() * 8999 + 1000));
+                    setCodigoVerificacao(codigo);
+                    query.setClauses(new IClause[]{
+                        CREATE.node(usuario).label("Usuario")
+                        .property("nome").value(nome)
+                        .property("sobrenome").value(sobrenome)
+                        .property("username").value(username)
+                        .property("email").value(email)
+                        .property("senha").value(senha)
+                        .property("data_nascimento").value(dataNasc)
+                        .property("genero").value(genero)
+                        .property("sobre").value(sobre)
+                        .property("validado").value("nao")
+                        .property("codigo_enviado").value(codigo)
+                    });
+                    JcQueryResult result = remote.execute(query);
+                    ControleLogin.setUsernameLogado(username);
+                    if (result.hasErrors()) {
+                        response.sendRedirect("criacao_conta.jsp?msg=falha");
+                        return;
+                    }
                     Properties eProps = new Properties();
                     eProps.put("mail.smtp.host", "smtp.gmail.com");
                     eProps.put("mail.smtp.socketFactory.port", "465");
@@ -211,31 +232,10 @@ public class CadastroUsuario extends HttpServlet {
                     String artigo = (genero.equals("masculino") ? "o" : "a");
                     String assunto = "Bem vind" + artigo + " ao Frienterest";
                     message.setSubject(assunto);
-                    String codigo = String.valueOf((int) (java.lang.Math.random() * 8999 + 1000));
-                    setCodigoVerificacao(codigo);
                     String mensagem = "Olá " + nome + ", tudo bem?\nSeja bem vind" + artigo + " ao Frienterest: uma rede de pessoas interessantes. \nPor favor, use o código " + codigo + " quando for necessário.\nAtenciosamente.\nEquipe Frienterest";
                     message.setText(mensagem);
                     Transport.send(message);
-
-                    query.setClauses(new IClause[]{
-                        CREATE.node(usuario).label("Usuario")
-                        .property("nome").value(nome)
-                        .property("sobrenome").value(sobrenome)
-                        .property("username").value(username)
-                        .property("email").value(email)
-                        .property("senha").value(senha)
-                        .property("data_nascimento").value(dataNasc)
-                        .property("genero").value(genero)
-                        .property("sobre").value(sobre)
-                        .property("validado").value("nao")
-                        .property("codigo_enviado").value(codigo)
-                    });
-                    JcQueryResult result = remote.execute(query);
-
-                    if (result.hasErrors()) {
-                        response.sendRedirect("criacao_conta.jsp?msg=falha");
-                    }
-
+                  
                     response.sendRedirect("verificacao_email.jsp?msg="+username);
                 }            
                 else if (existeUsuarioComUsername || existeUsuarioComEmail) {
