@@ -63,10 +63,10 @@
         <link rel="shortcut icon" href="frienterest.ico">
     </head>
     <body>
-        
-        
+
+
         <!-- Busca -->
-        
+
         <nav class="top-bar" data-topbar role="navigation">
             <form method="POST" action="BuscaPessoas">
                 <ul class="title-area">
@@ -151,7 +151,7 @@
         IDBAccess remote = DBAccessFactory.createDBAccess(DBType.REMOTE, props, usernameDB, passwdDB);
         JcNode usuario = new JcNode("Usuario");
         JcQuery query = new JcQuery();
-        String mensagem; 
+        String mensagem;
         try {
             String nomeUsuario = request.getParameter("msg").toString();
             query.setClauses(new IClause[]{
@@ -160,22 +160,22 @@
             });
             JcQueryResult resultado = remote.execute(query);
             if (resultado.hasErrors()) { %>
-                <h1><%out.println("Deu ruim");%></h1>
-            <% }
+    <h1><%out.println("Deu ruim");%></h1>
+    <% }
 
             List<GrNode> usuarios = resultado.resultOf(usuario);
             String nome = (String) usuarios.get(0).getProperty("nome").getValue();
             String genero = (String) usuarios.get(0).getProperty("genero").getValue();
             String artigo;
-            if (genero.equals("null")) 
+            if (genero.equals("null")) {
                 artigo = "o";
-            else if (genero.equals("masculino"))
+            } else if (genero.equals("masculino")) {
                 artigo = "o";
-            else 
+            } else {
                 artigo = "a";
-            mensagem = "Seja bem vind" +artigo +" " +nome;
-        }
-        catch (NullPointerException e) {
+            }
+            mensagem = "Seja bem vind" + artigo + " " + nome;
+        } catch (NullPointerException e) {
             mensagem = "Seja bem vindo";
         }
 //String[] nomeSexo = request.getParameter("msg").toString().split("_"); ARRUMAR ISSO!
@@ -419,81 +419,6 @@
 
             });
 
-        </script>
-    </div>
-
-    <div id="graph3">
-        <script src="//d3js.org/d3.v3.min.js"></script>
-        <script>
-
-            var width = 960,
-                    height = 500;
-
-            var color = d3.scale.category20();
-
-            var force = d3.layout.force()
-                    .charge(-120)
-                    .linkDistance(30)
-                    .size([width, height]);
-
-            var svg = d3.select("graph3").append("svg")
-                    .attr("width", width)
-                    .attr("height", height);
-
-            d3.json("miserables.json", function (error, graph) {
-                if (error)
-                    throw error;
-
-                force
-                        .nodes(graph.nodes)
-                        .links(graph.links)
-                        .start();
-
-                var link = svg.selectAll(".link")
-                        .data(graph.links)
-                        .enter().append("line")
-                        .attr("class", "link")
-                        .style("stroke-width", function (d) {
-                            return Math.sqrt(d.value);
-                        });
-
-                var node = svg.selectAll(".node")
-                        .data(graph.nodes)
-                        .enter().append("circle")
-                        .attr("class", "node")
-                        .attr("r", 5)
-                        .style("fill", function (d) {
-                            return color(d.group);
-                        })
-                        .call(force.drag);
-
-                node.append("title")
-                        .text(function (d) {
-                            return d.name;
-                        });
-
-                force.on("tick", function () {
-                    link.attr("x1", function (d) {
-                        return d.source.x;
-                    })
-                            .attr("y1", function (d) {
-                                return d.source.y;
-                            })
-                            .attr("x2", function (d) {
-                                return d.target.x;
-                            })
-                            .attr("y2", function (d) {
-                                return d.target.y;
-                            });
-
-                    node.attr("cx", function (d) {
-                        return d.x;
-                    })
-                            .attr("cy", function (d) {
-                                return d.y;
-                            });
-                });
-            });
             var some_data2 =
                     {
                         "nodes":
@@ -509,8 +434,99 @@
                                     {source: 2, target: 3, type: "WORKS_ON"}
                                 ]
                     }
+
         </script>
     </div>
+
+    <!--    <div id="graph3">
+            <script src="//d3js.org/d3.v3.min.js"></script>
+            <script>
+    
+                var width = 960,
+                        height = 500;
+    
+                var color = d3.scale.category20();
+    
+                var force = d3.layout.force()
+                        .charge(-120)
+                        .linkDistance(30)
+                        .size([width, height]);
+    
+                var svg = d3.select("graph3").append("svg")
+                        .attr("width", width)
+                        .attr("height", height);
+    
+                d3.json("miserables.json", function (error, graph) {
+                    if (error)
+                        throw error;
+    
+                    force
+                            .nodes(graph.nodes)
+                            .links(graph.links)
+                            .start();
+    
+                    var link = svg.selectAll(".link")
+                            .data(graph.links)
+                            .enter().append("line")
+                            .attr("class", "link")
+                            .style("stroke-width", function (d) {
+                                return Math.sqrt(d.value);
+                            });
+    
+                    var node = svg.selectAll(".node")
+                            .data(graph.nodes)
+                            .enter().append("circle")
+                            .attr("class", "node")
+                            .attr("r", 5)
+                            .style("fill", function (d) {
+                                return color(d.group);
+                            })
+                            .call(force.drag);
+    
+                    node.append("title")
+                            .text(function (d) {
+                                return d.name;
+                            });
+    
+                    force.on("tick", function () {
+                        link.attr("x1", function (d) {
+                            return d.source.x;
+                        })
+                                .attr("y1", function (d) {
+                                    return d.source.y;
+                                })
+                                .attr("x2", function (d) {
+                                    return d.target.x;
+                                })
+                                .attr("y2", function (d) {
+                                    return d.target.y;
+                                });
+    
+                        node.attr("cx", function (d) {
+                            return d.x;
+                        })
+                                .attr("cy", function (d) {
+                                    return d.y;
+                                });
+                    });
+                });
+                var some_data2 =
+                        {
+                            "nodes":
+                                    [
+                                        {name: "Peter", label: "Person", id: 1},
+                                        {name: "Michael", label: "Person", id: 2},
+                                        {name: "Neo4j", label: "Database", id: 3}
+                                    ],
+                            "edges":
+                                    [
+                                        {source: 1, target: 2, type: "KNOWS", since: 2010},
+                                        {source: 1, target: 3, type: "FOUNDED"},
+                                        {source: 2, target: 3, type: "WORKS_ON"}
+                                    ]
+                        }
+            </script>
+        </div>-->
 
 </body>
 </html>
