@@ -130,17 +130,12 @@ public class DemonstrarInteresse extends HttpServlet {
             MATCH.node(usuario).label("Usuario").property("username").value(username),
             RETURN.value(usuario)
         });
-        resultado = remote.execute(descobertaPalavrasChave);
+        resultado = remote.execute(descobertaUsuario);
         if (resultado.hasErrors()) {
             System.out.println("Houve erro durante a descoberta do usuario");
         }
         
-        List<GrNode> usuarios = resultado.resultOf(usuario);
-        if (usuarios.isEmpty()) {
-            System.out.println("lista vazia");
-        }
-        
-        /*String interessesUsuario = resultado.resultOf(usuario).get(0).getProperty("interesses").getValue().toString();
+        String interessesUsuario = resultado.resultOf(usuario).get(0).getProperty("interesses").getValue().toString();
         
         Iterator<GrNode> iterador = palavrasChave.iterator();
         while (iterador.hasNext()) {
@@ -155,9 +150,11 @@ public class DemonstrarInteresse extends HttpServlet {
             MATCH.node(usuario).label("Usuario").property("username").value(username),
             DO.SET(usuario.property("interesses")).to(interessesUsuario)
         });
+        resultado = remote.execute(atualizacaoUsuario);
         if (resultado.hasErrors()) {
             System.out.println("Houve erro durante a atualizacao dos interesses do usuario");
-        }*/
+        }
+        response.sendRedirect("pagina_generica.jsp?msg="+nomePagina);
         //processRequest(request, response);
     }
 
