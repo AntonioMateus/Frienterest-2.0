@@ -148,7 +148,10 @@
             }
             else if (request.getParameter("msg") != null && request.getParameter("msg").toString().equals("exclusaoIncorreta")) {
                 out.print("<script>alert('Problemas ao repopular o banco de dados')</script>");
-            }%>        
+            }
+            else if (request.getParameter("msg") != null && request.getParameter("msg").toString().equals("bancoVazio")) {
+                out.print("<script>alert('Abra a conexao com o banco antes atraves do terminal')</script>");
+    }%>        
         <div id="intro" class="row full-width">
 
             <div class="small-6 medium-1 large-2 columns auth-plain">
