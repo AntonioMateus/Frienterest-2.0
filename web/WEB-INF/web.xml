@@ -66,6 +66,10 @@
         <servlet-name>CadastroPagina</servlet-name>
         <servlet-class>utils.CadastroPagina</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AdicionarAmigo</servlet-name>
+        <servlet-class>utils.Seguir</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>dispatcher</servlet-name>
         <url-pattern>*.htm</url-pattern>
@@ -105,6 +109,10 @@
     <servlet-mapping>
         <servlet-name>CadastroPagina</servlet-name>
         <url-pattern>/CadastroPagina</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdicionarAmigo</servlet-name>
+        <url-pattern>/AdicionarAmigo</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

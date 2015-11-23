@@ -79,7 +79,7 @@ public class SugestaoPaginas {
         JcQuery obtencaoPaginasMaisProximas = new JcQuery();
         obtencaoPaginasMaisProximas.setClauses(new IClause[] {
             MATCH.node(pagina).label("Pagina"),
-            RETURN.value(pagina).ORDER_BY("distancia").LIMIT(numeroPaginas)
+            RETURN.value(pagina).ORDER_BY_DESC("distancia").LIMIT(numeroPaginas)
         });
         List<GrNode> paginasARetornar = remote.execute(obtencaoPaginasMaisProximas).resultOf(pagina);
         atualizacaoDistancias = new JcQuery(); 
