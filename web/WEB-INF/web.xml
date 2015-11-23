@@ -43,7 +43,7 @@
         <servlet-class>utils.ControleLogin</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ControleLogin</servlet-name>
+        <servlet-name>DemonstrarInteresse</servlet-name>
         <servlet-class>utils.DemonstrarInteresse</servlet-class>
     </servlet>
     <servlet>
