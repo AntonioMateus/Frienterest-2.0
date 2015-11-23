@@ -116,12 +116,11 @@
             <section class="top-bar-section">
 
                 <!-- Right Nav Section -->
-
                 <%String username = ControleLogin.getUsernameLogado();%>
                 <ul class="right">
                     <li><form method="post" action="ExcluirConta"><input type="submit" value="Excluir conta" class="button"></form></li>
                     <li><a href="pagina_usuario.jsp?msg=<%=username%>">Minha página</a></li>
-                    <li><a href="criacao_pagina.jsp">Criar página</a></li>               
+                    <li><a href="criacao_pagina.jsp">Criar página</a></li>                
 
                     <!-- <li class="has-dropdown">
     
