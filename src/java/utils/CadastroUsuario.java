@@ -20,6 +20,9 @@ import iot.jcypher.query.factories.clause.RETURN;
 import iot.jcypher.query.values.JcNode;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -153,7 +156,10 @@ public class CadastroUsuario extends HttpServlet {
             String dataNasc = request.getParameter("data_nascimento");
             String genero = request.getParameter("genero");
             String sobre = request.getParameter("sobre");
-                
+            
+            DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+            df.setLenient(false);
+            df.parse(dataNasc);
             if (copia_senha.equals(senha)) {
                 setUsernameUsuario(username);
                 setEmailUsuario(email);
@@ -250,6 +256,9 @@ public class CadastroUsuario extends HttpServlet {
             }
         } catch (MessagingException mex) {
             response.sendRedirect("criacao_conta.jsp?msg=emailInvalido");
+        }
+        catch (ParseException p) {
+            response.sendRedirect("criacao_conta.jsp?msg=dataInvalida");
         }
     }
 

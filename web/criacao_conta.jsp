@@ -11,6 +11,28 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Cadastro - Frienterest</title>
         <link href="css/foundation.css" rel="stylesheet" type="text/css"/>
+        <script language="JavaScript" type="text/javascript">
+            function mascaraData (campoData, e) {
+                if (document.all) 
+                    var tecla = event.keyCode;
+                else
+                    var tecla = e.which;
+                
+                if (tecla >= 47 && tecla < 58) {
+                    var data = campoData.value;
+                }
+                if (data.length === 2 || data.length === 5) {
+                    data += '/';
+                    campoData.value = data;
+                }
+                else if (tecla === 8 || tecla === 0) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        </script>
         <style type="text/css">
             .signup-panel {
 
@@ -103,6 +125,9 @@
                 out.print("<script>alert('Houve um erro ao enviar o email de verificação. Desculpe-nos pelo transtorno mas refaça o cadastro.')</script>");
             } else if (request.getParameter("msg") != null && request.getParameter("msg").toString().equals("usuarioExistente")) {
                 out.print("<script>alert('Ja existe algum usuario com esse email ou nome de usuario.')</script>");
+            }
+            else if (request.getParameter("msg") != null && request.getParameter("msg").toString().equals("dataInvalida")) {
+                out.print("<script>alert('A data de nascimento inserida eh invalida')</script>");
             }%>
         <div class="row">
 
@@ -153,7 +178,7 @@
 
                             <div class="small-10 columns ">
 
-                                <input type="username" placeholder="nome de usuaro" name="username">
+                                <input type="username" placeholder="nome de usuario" name="username">
 
                             </div>
 
@@ -216,7 +241,7 @@
 
                             <div class="small-10 columns ">
 
-                                <input type="text" placeholder="data de nascimento(dd/mm/aa)" name="data_nascimento">
+                                <input type="text" placeholder="data de nascimento" name="data_nascimento" onkeyup="mascaraData(this,event);" maxlength="10">
 
                             </div>
 
