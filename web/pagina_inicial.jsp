@@ -66,6 +66,10 @@
 
         </style>
         <link rel="shortcut icon" href="frienterest.ico">
+        
+        <script src="js/jquery-2.1.4.min.js"></script>
+        <script src="http://d3js.org/d3.v3.js"></script>
+        
     </head>
     <body>
 
@@ -437,37 +441,54 @@
                     </script>
                 </div>-->
 
-
-        <script src="http://d3js.org/d3.v3.js"></script>
         <script>
             var buscaUsuario = <%ControleLogin.getUsernameLogado();%>;
 
-            var r = require("request");
 
-            var txUrl = "http://localhost:7474/db/data/transaction/commit";
+            // The query
+            var query = {"statements": [{"statement": "MATCH p=(n)-->(m)<--(k),(n)--(k) RETURN p Limit 100",
+                        "resultDataContents": ["graph", "row"]}]};
 
-            function cypher(query, params, cb) {
+//the helper function provided by neo4j documents
+            function idIndex(a, id) {
+                for (var i = 0; i < a.length; i++) {
+                    if (a[i].id == id)
+                        return i;
+                }
+                return null;
+            }
+// jQuery ajax call
+            var request = $.ajax({
+                type: "POST",
+                url: "http://localhost:7474/db/data/transaction/commit",
+                accepts: {json: "application/json"},
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify(query),
+                //now pass a callback to success to do something with the data
+                success: function (data) {
+                    // parsing the output of neo4j rest api
+                    data.results[0].data.forEach(function (row) {
+                        row.graph.nodes.forEach(function (n) {
+                            if (idIndex(nodes, n.id) == null) {
+                                nodes.push({id: n.id, label: n.labels[0], title: n.properties.name});
+                            }
+                        });
+                        links = links.concat(row.graph.relationships.map(function (r) {
+                            // the neo4j documents has an error : replace start with source and end with target
+                            return {source: idIndex(nodes, r.startNode), target: idIndex(nodes, r.endNode), type: r.type};
+                        }));
+                    });
+                    window.graph = {nodes: nodes, links: links};
+                    log.console(graph);
+                    // Now do something awesome with the graph!
 
-                r.post({uri: txUrl,
-                    json: {statements: [{statement: query, parameters: params}]}},
-                function (err, res) {
-                    cb(err, res.body)
-                })
+                }
 
-            };
-
-            var query = "MATCH (n:Usuario) RETURN n, LIMIT {limit}";
-
-            var params = {limit: 40};
-
-            var cb = function (err, dados) {
-                return JSON.stringify(dados);
-            };
-
-            var resultado = cypher(query, params, cb);
-
-            console.log(resultado);
-            
+            });
+        </script>
+        
+        <script>
             data = {
                 nodes: [
                     {size: 10},
