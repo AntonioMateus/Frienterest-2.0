@@ -15,6 +15,7 @@ import iot.jcypher.query.api.IClause;
 import iot.jcypher.query.factories.clause.CREATE;
 import iot.jcypher.query.factories.clause.DO;
 import iot.jcypher.query.factories.clause.MATCH;
+import iot.jcypher.query.factories.clause.RETURN;
 import iot.jcypher.query.values.JcNode;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -109,6 +110,7 @@ public class CadastroPagina extends HttpServlet {
             .property("nome").value(nomePagina)
             .property("descricao").value(descricao)
             .property("interesses").value("0000000000000000000")
+            .property("distancia").value(0)
         });
         String interesses = "00000000000000000000";
         remote.execute(criacaoPagina);
@@ -326,7 +328,7 @@ public class CadastroPagina extends HttpServlet {
         JcQuery atualizacaoInteressesPagina = new JcQuery(); 
         atualizacaoInteressesPagina.setClauses(new IClause[] {
             MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
-            DO.SET(pagina.property("interesses")).to(interesses)
+            DO.SET(pagina.property("interesses")).to(interesses)            
         });
         remote.execute(atualizacaoInteressesPagina);
         response.sendRedirect("pagina_generica.jsp?msg="+nomePagina);
