@@ -5,7 +5,6 @@ package utils;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 import iot.jcypher.database.DBAccessFactory;
 import iot.jcypher.database.DBProperties;
 import iot.jcypher.database.DBType;
@@ -14,6 +13,8 @@ import iot.jcypher.query.JcQuery;
 import iot.jcypher.query.JcQueryResult;
 import iot.jcypher.query.api.IClause;
 import iot.jcypher.query.factories.clause.CREATE;
+import iot.jcypher.query.factories.clause.MATCH;
+import iot.jcypher.query.factories.clause.RETURN;
 import iot.jcypher.query.result.JcError;
 import iot.jcypher.query.values.JcNode;
 import java.io.IOException;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.Random;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -53,7 +55,7 @@ public class InicializacaoBancoDados extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet InicializacaoPalavrasChave</title>");            
+            out.println("<title>Servlet InicializacaoPalavrasChave</title>");
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Servlet InicializacaoPalavrasChave at " + request.getContextPath() + "</h1>");
@@ -78,8 +80,15 @@ public class InicializacaoBancoDados extends HttpServlet {
     }
 
     private enum TipoNo implements Label {
+
         PalavraChave;
-    } 
+    }
+
+    private enum TipoNo2 implements Label {
+
+        Usuario;
+    }
+
     /**
      * Handles the HTTP <code>POST</code> method.
      *
@@ -91,7 +100,7 @@ public class InicializacaoBancoDados extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-       
+
         final String SERVER_ROOT_URI = "http://localhost:7474/";
         final String usernameDB = "neo4j";
         final String passwdDB = "dba";
@@ -106,24 +115,24 @@ public class InicializacaoBancoDados extends HttpServlet {
         JcNode usuario = new JcNode("Usuario");
         final int NUM_PALAVRAS = 20;
         final int NUM_USUARIOS = 30;
+        final int NUM_SOBRENOMES = 30;
         try {
             JcQueryResult result;
             List<JcError> errors = remote.clearDatabase();
             if (!errors.isEmpty()) {
                 System.out.println("Houve erro ao excluir as palavras-chave");
-            }
-            else {
+            } else {
                 ArrayList<String> interesses = new ArrayList<String>(NUM_PALAVRAS);
                 interesses.addAll(Arrays.asList("esportes", "politica", "educacao", "meio_ambiente",
-                    "informatica", "cinema", "teatro", "psicologia", "curiosidades", "humor",
-                    "saude", "economia", "noticias", "marketing", "musicas", "games",
-                    "viagem", "literatura", "animais", "series_televisao"));
+                        "informatica", "cinema", "teatro", "psicologia", "curiosidades", "humor",
+                        "saude", "economia", "noticias", "marketing", "musicas", "games",
+                        "viagem", "literatura", "animais", "series_televisao"));
                 int i;
                 for (i = 0; i < NUM_PALAVRAS; i++) {
                     JcQuery criacaoPalavras = new JcQuery();
                     criacaoPalavras.setClauses(new IClause[]{
                         CREATE.node(palavraChave).label("PalavraChave")
-                        .property("id").value(""+(i+1))
+                        .property("id").value("" + (i + 1))
                         .property("nome").value(interesses.get(i))
                     });
                     result = remote.execute(criacaoPalavras);
@@ -134,20 +143,25 @@ public class InicializacaoBancoDados extends HttpServlet {
                 if (i < NUM_PALAVRAS) {
                     System.out.println("Houve erro ao criar as palvras-chave");
                 }
-                
+
                 ArrayList<String> nomes = new ArrayList<String>(NUM_USUARIOS);
                 nomes.addAll(Arrays.asList("Le", "Ima", "Dortha", "Raina",
-                    "Sharolyn", "Colby", "Janita", "Coleman", "Jeanelle", "Alicia",
-                    "Valene", "Winston", "Rebbeca", "Sebrina", "Desirae", "Loura",
-                    "Sherie", "Mallie", "Tomas", "Carolee", "Vincenza", "Tyesha",
-                    "Rhiannon", "Joesph", "Tijuana", "Lashandra", "Gene", "Melynda",
-                    "Shirly", "Ulrike"));
-                ArrayList<String> sobrenomes = new ArrayList<String>(30);
-
+                        "Sharolyn", "Colby", "Janita", "Coleman", "Jeanelle", "Alicia",
+                        "Valene", "Winston", "Rebbeca", "Sebrina", "Desirae", "Loura",
+                        "Sherie", "Mallie", "Tomas", "Carolee", "Vincenza", "Tyesha",
+                        "Rhiannon", "Joesph", "Tijuana", "Lashandra", "Gene", "Melynda",
+                        "Shirly", "Ulrike"));
+                ArrayList<String> sobrenomes = new ArrayList<String>(NUM_SOBRENOMES);
+                sobrenomes.addAll(Arrays.asList("Williamson", "Walls", "Hammond",
+                        "Zuniga", "Chen", "Greer", "Rocha", "Oliver", "Barton",
+                        "Stevenson", "Gardner", "Curry", "Hodge", "Mayo", "Reilly",
+                        "Mcfarland", "Cox", "Decker", "Duarte", "Ayers", "Barber",
+                        "Leach", "Morrison", "Duffy", "Freeman", "Barajas", "Briggs",
+                        "Olson", "Gamble", "Franklin"));
                 ArrayList<String> genero = new ArrayList<String>(30);
                 genero.add("masculino");
                 genero.add("feminino");
-                
+
                 int j;
                 for (j = 0; j < NUM_USUARIOS; j++) {
                     JcQuery query = new JcQuery();
@@ -155,13 +169,13 @@ public class InicializacaoBancoDados extends HttpServlet {
                         CREATE.node(usuario).label("Usuario")
                         .property("id").value(j)
                         .property("nome").value(nomes.get(j))
-                        .property("sobrenome").value("da Silva")
-                        .property("username").value(nomes.get(j).toLowerCase() + "_frienterestUser" + j)
+                        .property("sobrenome").value(sobrenomes.get(j % NUM_SOBRENOMES))
+                        .property("username").value(nomes.get(j).toLowerCase() + "_" + sobrenomes.get(j % NUM_SOBRENOMES).toLowerCase())
                         .property("sexo").value(genero.get(j % 2))
-                        .property("email").value(nomes.get(j).toLowerCase() + "@email.com")
+                        .property("email").value(nomes.get(j).toLowerCase() + "." + sobrenomes.get(j % 30).toLowerCase() + "@email.com")
                         .property("senha").value("senha123")
-                        .property("nascimento").value("1/1/1")
-                        .property("sobre").value("Uma pessoa interessante" + j)
+                        .property("nascimento").value((j % 28) + "/" + (j % 12) + "/" + (j + 1980))
+                        .property("sobre").value("Sou mais uma pessoa interessante! Fui a numero " + j + " a me cadastrar!")
                         .property("validado").value("sim")
                     });
                     result = remote.execute(query);
@@ -169,20 +183,57 @@ public class InicializacaoBancoDados extends HttpServlet {
                         break;
                     }
                 }
+
+                JcNode seguidor = new JcNode("Usuario");
+                JcNode seguido = new JcNode("Usuario");
+                for (int h = 0; h < 40; h++) {
+                    Random rand = new Random();
+                    int randomNum1 = rand.nextInt(((NUM_USUARIOS - 2) - 0) + 1) + 0;
+                    int randomNum2 = rand.nextInt(((NUM_USUARIOS - 2) - 0) + 1) + 0;
+
+                    JcQuery query = new JcQuery();
+                    query.setClauses(new IClause[]{
+                        MATCH.node(seguidor).label("Usuario").property("id").value(randomNum1),
+                        MATCH.node(seguido).label("Usuario").property("id").value(randomNum2),
+                        CREATE.node(seguidor).relation().out().type("segue").node(seguido)
+                    });
+
+                    result = remote.execute(query);
+                    if (result.hasErrors()) {
+                        break;
+                    }
+                }
+
+//                JcQuery query = new JcQuery();
+//                query.setClauses(new IClause[]{
+//                    MATCH.node(seguidor).label("Usuario").property("id").value(0),
+//                    RETURN.value(seguidor)
+//                });
+//                result = remote.execute(query);
+//                
+//                query.setClauses(new IClause[]{
+//                    MATCH.node(seguido).label("Usuario").property("id").value(1),
+//                    RETURN.value(seguido)
+//                });
+//                result = remote.execute(query);
+//                
+//                query.setClauses(new IClause[]{
+//                    CREATE.node(seguidor).relation().out().type("segue").node(seguido)
+//                });
+//                result = remote.execute(query);
+//                
                 
-                if (j < NUM_USUARIOS){
+                if (j < NUM_USUARIOS) {
                     System.out.println("Houve erros durante a criacao dos usuarios");
-                }                
+                }
             }
             response.sendRedirect("redirect.jsp");
-        }
-        catch (NullPointerException n) {
+        } catch (NullPointerException n) {
             response.sendRedirect("redirect.jsp?msg=bancoVazio");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             response.sendRedirect("redirect.jsp?msg=exclusaoIncorreta");
         }
-        
+
     }
 
     /**
