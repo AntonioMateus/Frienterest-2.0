@@ -13,6 +13,7 @@ import iot.jcypher.database.IDBAccess;
 import iot.jcypher.query.JcQuery;
 import iot.jcypher.query.api.IClause;
 import iot.jcypher.query.factories.clause.CREATE;
+import iot.jcypher.query.factories.clause.DO;
 import iot.jcypher.query.factories.clause.MATCH;
 import iot.jcypher.query.values.JcNode;
 import java.io.IOException;
@@ -69,7 +70,13 @@ public class CadastroPagina extends HttpServlet {
             throws ServletException, IOException {
         processRequest(request, response);
     }
-
+    
+    private String replace(String palavra, int posicao, char caractereNovo) {
+        char[] palavraVetor = palavra.toCharArray();
+        palavraVetor[posicao] = caractereNovo;
+        return String.valueOf(palavraVetor);
+    }
+    
     /**
      * Handles the HTTP <code>POST</code> method.
      *
@@ -101,7 +108,9 @@ public class CadastroPagina extends HttpServlet {
             CREATE.node(pagina).label("Pagina")
             .property("nome").value(nomePagina)
             .property("descricao").value(descricao)
+            .property("interesses").value("0000000000000000000")
         });
+        String interesses = "00000000000000000000";
         remote.execute(criacaoPagina);
         JcQuery relacionamentoPaginaPalavraChave;
         JcNode palavraChave = new JcNode("PalavraChave");
@@ -113,6 +122,7 @@ public class CadastroPagina extends HttpServlet {
                 CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
+            this.replace(interesses,0,'1');
         }
         if (request.getParameter("politica") != null) {
             relacionamentoPaginaPalavraChave = new JcQuery();
@@ -122,6 +132,7 @@ public class CadastroPagina extends HttpServlet {
                 CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
+            this.replace(interesses,1,'1');
         }
         if (request.getParameter("educacao") != null) {
             relacionamentoPaginaPalavraChave = new JcQuery();
@@ -131,6 +142,7 @@ public class CadastroPagina extends HttpServlet {
                 CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
+            this.replace(interesses,2,'1');
         }
         if (request.getParameter("meio_ambiente") != null) {
             relacionamentoPaginaPalavraChave = new JcQuery();
@@ -140,6 +152,7 @@ public class CadastroPagina extends HttpServlet {
                 CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
+            this.replace(interesses,3,'1');
         }
         if (request.getParameter("informatica") != null) {
             relacionamentoPaginaPalavraChave = new JcQuery();
@@ -149,6 +162,7 @@ public class CadastroPagina extends HttpServlet {
                 CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
+            this.replace(interesses,4,'1');
         }
         if (request.getParameter("cinema") != null) {
             relacionamentoPaginaPalavraChave = new JcQuery();
@@ -158,6 +172,7 @@ public class CadastroPagina extends HttpServlet {
                 CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
+            this.replace(interesses,5,'1');
         }
         if (request.getParameter("teatro") != null) {
             relacionamentoPaginaPalavraChave = new JcQuery();
@@ -167,6 +182,7 @@ public class CadastroPagina extends HttpServlet {
                 CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
+            this.replace(interesses,6,'1');
         }
         if (request.getParameter("psicologia") != null) {
             relacionamentoPaginaPalavraChave = new JcQuery();
@@ -176,6 +192,7 @@ public class CadastroPagina extends HttpServlet {
                 CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
+            this.replace(interesses,7,'1');
         }
         if (request.getParameter("curiosidades") != null) {
             relacionamentoPaginaPalavraChave = new JcQuery();
@@ -185,6 +202,7 @@ public class CadastroPagina extends HttpServlet {
                 CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
+            this.replace(interesses,8,'1');
         }
         if (request.getParameter("humor") != null) {
             relacionamentoPaginaPalavraChave = new JcQuery();
@@ -194,6 +212,7 @@ public class CadastroPagina extends HttpServlet {
                 CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
+            this.replace(interesses,9,'1');
         }
         if (request.getParameter("saude") != null) {
             relacionamentoPaginaPalavraChave = new JcQuery();
@@ -203,6 +222,7 @@ public class CadastroPagina extends HttpServlet {
                 CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
+            this.replace(interesses,10,'1');
         }
         if (request.getParameter("economia") != null) {
             relacionamentoPaginaPalavraChave = new JcQuery();
@@ -212,6 +232,7 @@ public class CadastroPagina extends HttpServlet {
                 CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
+            this.replace(interesses,11,'1');
         }
         if (request.getParameter("noticias") != null) {
             relacionamentoPaginaPalavraChave = new JcQuery();
@@ -221,6 +242,7 @@ public class CadastroPagina extends HttpServlet {
                 CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
+            this.replace(interesses,12,'1');
         }
         if (request.getParameter("marketing") != null) {
             relacionamentoPaginaPalavraChave = new JcQuery();
@@ -230,6 +252,7 @@ public class CadastroPagina extends HttpServlet {
                 CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
+            this.replace(interesses,13,'1');
         }
         if (request.getParameter("musica") != null) {
             relacionamentoPaginaPalavraChave = new JcQuery();
@@ -239,6 +262,7 @@ public class CadastroPagina extends HttpServlet {
                 CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
+            this.replace(interesses,14,'1');
         }
         if (request.getParameter("games") != null) {
             relacionamentoPaginaPalavraChave = new JcQuery();
@@ -248,6 +272,7 @@ public class CadastroPagina extends HttpServlet {
                 CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
+            this.replace(interesses,15,'1');
         }
         if (request.getParameter("viagem") != null) {
             relacionamentoPaginaPalavraChave = new JcQuery();
@@ -257,6 +282,7 @@ public class CadastroPagina extends HttpServlet {
                 CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
+            this.replace(interesses,16,'1');
         }
         if (request.getParameter("literatura") != null) {
             relacionamentoPaginaPalavraChave = new JcQuery();
@@ -266,6 +292,7 @@ public class CadastroPagina extends HttpServlet {
                 CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
+            this.replace(interesses,17,'1');
         }
         if (request.getParameter("animais") != null) {
             relacionamentoPaginaPalavraChave = new JcQuery();
@@ -275,6 +302,7 @@ public class CadastroPagina extends HttpServlet {
                 CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
+            this.replace(interesses,18,'1');
         }
         if (request.getParameter("series_televisao") != null) {
             relacionamentoPaginaPalavraChave = new JcQuery();
@@ -284,6 +312,7 @@ public class CadastroPagina extends HttpServlet {
                 CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
             });
             remote.execute(relacionamentoPaginaPalavraChave);
+            this.replace(interesses,19,'1');
         }
         String usernameCriador = ControleLogin.getUsernameLogado();
         JcQuery correspondenciaPaginaCriador = new JcQuery();
@@ -293,6 +322,13 @@ public class CadastroPagina extends HttpServlet {
             MATCH.node(pagina).label("Pagina"),
             CREATE.node(criador).relation().out().type("CriaPagina").node(pagina)
         });
+        remote.execute(correspondenciaPaginaCriador);
+        JcQuery atualizacaoInteressesPagina = new JcQuery(); 
+        atualizacaoInteressesPagina.setClauses(new IClause[] {
+            MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
+            DO.SET(pagina.property("interesses")).to(interesses)
+        });
+        remote.execute(atualizacaoInteressesPagina);
         response.sendRedirect("pagina_generica.jsp?msg="+nomePagina);
     }
 
