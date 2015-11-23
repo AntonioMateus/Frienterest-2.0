@@ -109,7 +109,6 @@
             </form>
             <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
 
-            
             <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
 
 
@@ -475,24 +474,46 @@
                 data: JSON.stringify(query),
                 //now pass a callback to success to do something with the data
                 success: function (data) {
-                    // parsing the output of neo4j rest api
-                    data.results[0].data.forEach(function (row) {
-                        row.graph.nodes.forEach(function (n) {
-                            nodes = [];
-                            if (idIndex(nodes, n.id) === null) {
-                                nodes.push({id: n.id, label: n.labels[0], title: n.properties.name});
-                            }
-                        });
-                        links = [{source: 0, target: 0, type: ""}];
-                        links = links.concat(row.graph.relationships.map(function (r) {
-                            // the neo4j documents has an error : replace start with source and end with target
-//                            console.log(idIndex(nodes, r.startNode).toString());
-//                            console.log(idIndex(nodes, r.endNode).toString());
-                            return {source: idIndex(nodes, r.startNode), target: 0/*idIndex(nodes, r.endNode)*/, type: r.type};
-                        }));
-                    });
-                    graph = {nodes: nodes, links: links};
+//                    //console.log(JSON.stringify(data.results, null, 2));
+//                    // parsing the output of neo4j rest api            
+//                    data.results[0].data.forEach(function (row) {
+//                        row.graph.nodes.forEach(function (n) {
+//                            nodes = [];
+//                            if (idIndex(nodes, n.id) === null) {
+//                                nodes.push({id: n.id, label: n.labels[0], title: n.properties.name});
+//                            }
+//                        });
+//                        links = [];
+//                        links = links.concat(row.graph.relationships.map(function (r) {
+//                            // the neo4j documents has an error : replace start with source and end with target
+//                            //console.log(idIndex(nodes, r.startNode).toString());
+////                            console.log(idIndex(nodes, r.endNode).toString());
+//                            return {source: idIndex(nodes, r.startNode), target: idIndex(nodes, r.endNode), type: r.type};
+//                        }));
+//                    });
+//                    graph = {nodes: nodes, links: links};
 //                    console.log(graph.nodes.toString());
+
+                    var nodes = [], links = [];
+
+                    data.results[0].data.forEach(function (row) {
+
+                        row.graph.nodes.forEach(function (n) {
+
+                            if (idIndex(nodes, n.id) == null)
+                                nodes.push({id: n.id, label: n.labels[0], title: n.properties.name});
+
+                        });
+
+                        links = links.concat(row.graph.relationships.map(function (r) {
+
+                            return {source: idIndex(nodes, r.startNode), target: idIndex(nodes, r.endNode), type: r.type};
+
+                        }));
+
+                    });
+
+                    viz = {nodes: nodes, links: links};
 
                     // Now do something awesome with the graph!
 
@@ -588,16 +609,15 @@
                     }
 
                     function node_radius(d) {
-                        return Math.pow(40.0 * d.size, 1 / 3);
+                        return Math.pow(40.0 * 20/*d.size*/, 1 / 3);
                     }
 
                     var width = 1000;
                     var height = 500;
 
-                    var nodes = graph.nodes;
-                    console.log(graph.nodes);
-                    var links = graph.links;
-                    console.log(graph.links);
+                    var nodes = viz.nodes;
+                    var links = viz.links;
+                    console.log(JSON.stringify(viz, null, 2));
 
                     var force = d3.layout.force()
                             .nodes(nodes)
