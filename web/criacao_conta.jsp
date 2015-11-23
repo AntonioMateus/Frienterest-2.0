@@ -120,7 +120,7 @@
         <% if (request.getParameter("msg") != null && request.getParameter("msg").toString().equals("falha")) {
                 out.print("<script>alert('Senhas não correspondem. Por favor, refaça o cadastro.')</script>");
             } else if (request.getParameter("msg") != null && request.getParameter("msg").toString().equals("emailInvalido")) {
-                out.print("<script>alert('O email digitado é inválido!')</script>");
+                out.print("<script>alert('Houve um problema ao enviar o email de verificacao (falta de internet ou email invalido)')</script>");
             } else if (request.getParameter("msg") != null && request.getParameter("msg").toString().equals("falhaEnvio")) {
                 out.print("<script>alert('Houve um erro ao enviar o email de verificação. Desculpe-nos pelo transtorno mas refaça o cadastro.')</script>");
             } else if (request.getParameter("msg") != null && request.getParameter("msg").toString().equals("usuarioExistente")) {

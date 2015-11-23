@@ -33,6 +33,7 @@ import java.util.Properties;
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.SendFailedException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
@@ -213,6 +214,7 @@ public class CadastroUsuario extends HttpServlet {
                         .property("validado").value("nao")
                         .property("codigo_enviado").value(codigo)
                         .property("interesses").value("00000000000000000000")
+                        .property("distancia").value(0)
                     });
                     JcQueryResult result = remote.execute(query);
                     ControleLogin.setUsernameLogado(username);
@@ -253,8 +255,9 @@ public class CadastroUsuario extends HttpServlet {
             }
             else {
                 response.sendRedirect("criacao_conta.jsp?msg=falha");
-            }
-        } catch (MessagingException mex) {
+            }            
+        }                
+        catch (MessagingException mex) {
             response.sendRedirect("criacao_conta.jsp?msg=emailInvalido");
         }
         catch (ParseException p) {
