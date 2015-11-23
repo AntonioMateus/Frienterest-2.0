@@ -9,6 +9,9 @@ import iot.jcypher.database.DBAccessFactory;
 import iot.jcypher.database.DBProperties;
 import iot.jcypher.database.DBType;
 import iot.jcypher.database.IDBAccess;
+import iot.jcypher.graph.GrNode;
+import iot.jcypher.graph.GrRelation;
+import iot.jcypher.graph.Graph;
 import iot.jcypher.query.JcQuery;
 import iot.jcypher.query.JcQueryResult;
 import iot.jcypher.query.api.IClause;
@@ -184,45 +187,29 @@ public class InicializacaoBancoDados extends HttpServlet {
                     }
                 }
 
-                JcNode seguidor = new JcNode("Usuario");
-                JcNode seguido = new JcNode("Usuario");
-                for (int h = 0; h < 40; h++) {
+                JcQuery query = new JcQuery();
+                query.setClauses(new IClause[]{
+                    MATCH.node(usuario).label("Usuario"),
+                    RETURN.value(usuario)
+                });
+                result = remote.execute(query);
+                List<GrNode> seguidores = result.resultOf(usuario);
+                List<GrNode> seguidos = result.resultOf(usuario);
+
+                Graph graph = result.getGraph();
+                for (int h = 0; h < 5*NUM_USUARIOS; h++) {
                     Random rand = new Random();
-                    int randomNum1 = rand.nextInt(((NUM_USUARIOS - 2) - 0) + 1) + 0;
-                    int randomNum2 = rand.nextInt(((NUM_USUARIOS - 2) - 0) + 1) + 0;
-
-                    JcQuery query = new JcQuery();
-                    query.setClauses(new IClause[]{
-                        MATCH.node(seguidor).label("Usuario").property("id").value(randomNum1),
-                        MATCH.node(seguido).label("Usuario").property("id").value(randomNum2),
-                        CREATE.node(seguidor).relation().out().type("segue").node(seguido)
-                    });
-
-                    result = remote.execute(query);
-                    if (result.hasErrors()) {
-                        break;
+                    int randomNum1 = rand.nextInt((NUM_USUARIOS - 1));
+                    int randomNum2 = rand.nextInt((NUM_USUARIOS - 1));
+                    while(randomNum1==randomNum2){
+                        randomNum2 = rand.nextInt((NUM_USUARIOS - 1));
                     }
+                    GrRelation rel = graph.createRelation("segue", seguidores.get(randomNum1), seguidos.get(randomNum2));
+                    //rel.addProperty("role", "Neo");
                 }
 
-//                JcQuery query = new JcQuery();
-//                query.setClauses(new IClause[]{
-//                    MATCH.node(seguidor).label("Usuario").property("id").value(0),
-//                    RETURN.value(seguidor)
-//                });
-//                result = remote.execute(query);
-//                
-//                query.setClauses(new IClause[]{
-//                    MATCH.node(seguido).label("Usuario").property("id").value(1),
-//                    RETURN.value(seguido)
-//                });
-//                result = remote.execute(query);
-//                
-//                query.setClauses(new IClause[]{
-//                    CREATE.node(seguidor).relation().out().type("segue").node(seguido)
-//                });
-//                result = remote.execute(query);
-//                
-                
+                errors = graph.store();
+
                 if (j < NUM_USUARIOS) {
                     System.out.println("Houve erros durante a criacao dos usuarios");
                 }

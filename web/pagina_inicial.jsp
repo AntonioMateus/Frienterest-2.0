@@ -232,7 +232,7 @@
                         row.graph.nodes.forEach(function (n) {
 
                             if (idIndex(nodes, n.id) == null)
-                                nodes.push({id: n.id, label: n.labels[0], title: n.properties.name});
+                                nodes.push({id: n.id, label: n.labels[0], username: n.properties.username});
 
                         });
 
@@ -245,7 +245,7 @@
                     });
 
                     viz = {nodes: nodes, links: links};
-
+                    //console.log(JSON.stringify(viz));
                     // Now do something awesome with the graph!
 
                     var mouseOverFunction = function (d) {
@@ -337,10 +337,14 @@
                                 .attr("transform", function (d) {
                                     return "translate(" + d.x + "," + d.y + ")";
                                 });
+
+                        text.attr("transform", function (d) {
+                            return "translate(" + d.x + "," + d.y + ")";
+                        });
                     }
 
                     function node_radius(d) {
-                        return Math.pow(40.0 * 20/*d.size*/, 1 / 3);
+                        return Math.pow(40.0 * 130/*d.size*/, 1 / 3);
                     }
 
                     var width = 1000;
@@ -357,6 +361,7 @@
                             .friction(0.6)
                             .gravity(0.6)
                             .size([width, height])
+                            .linkDistance(120)
                             .start();
 
                     var linkedByIndex = {};
@@ -383,19 +388,25 @@
                             .attr("r", node_radius)
                             .on("mouseover", mouseOverFunction)
                             .on("mouseout", mouseOutFunction);
+                    var text = svg.append("svg:g").selectAll("g")
+                            .data(force.nodes())
+                            .enter().append("svg:g");
 
-                    var label = node.append("text")
+
+                    text.append("svg:text")
+                            .attr('y', '0.7em')
+                            .attr('class', 'name')
                             .text(function (d) {
-                console.log(d.label)                
-                return d.label.toString();
+                                return d.username;
                             });
+
                     svg
                             .append("marker")
                             .attr("id", "arrowhead")
-                            .attr("refX", 6 + 7) // Controls the shift of the arrow head along the path
+                            .attr("refX", 12 + 14) // Controls the shift of the arrow head along the path
                             .attr("refY", 2)
-                            .attr("markerWidth", 6)
-                            .attr("markerHeight", 4)
+                            .attr("markerWidth", 24)
+                            .attr("markerHeight", 16)
                             .attr("orient", "auto")
                             .append("path")
                             .attr("d", "M 0,0 V 4 L6,2 Z");
