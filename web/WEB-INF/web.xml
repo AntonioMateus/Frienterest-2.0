@@ -40,27 +40,27 @@
     </servlet>
     <servlet>
         <servlet-name>ControleLogin</servlet-name>
-        <servlet-class>ControleLogin</servlet-class>
+        <servlet-class>utils.ControleLogin</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>BuscaPessoas</servlet-name>
-        <servlet-class>BuscaPessoas</servlet-class>
+        <servlet-class>utils.BuscaPessoas</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>CadastroUsuario</servlet-name>
-        <servlet-class>CadastroUsuario</servlet-class>
+        <servlet-class>utils.CadastroUsuario</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>VerificacaoEmail</servlet-name>
-        <servlet-class>VerificacaoEmail</servlet-class>
+        <servlet-class>utils.VerificacaoEmail</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ExcluirConta</servlet-name>
-        <servlet-class>ExcluirConta</servlet-class>
+        <servlet-class>utils.ExcluirConta</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>CadastroPagina</servlet-name>
-        <servlet-class>CadastroPagina</servlet-class>
+        <servlet-class>utils.CadastroPagina</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>dispatcher</servlet-name>

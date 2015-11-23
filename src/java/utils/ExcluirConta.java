@@ -1,3 +1,5 @@
+package utils;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -9,12 +11,13 @@ import iot.jcypher.database.DBProperties;
 import iot.jcypher.database.DBType;
 import iot.jcypher.database.IDBAccess;
 import iot.jcypher.graph.GrNode;
+import iot.jcypher.graph.Graph;
 import iot.jcypher.query.JcQuery;
 import iot.jcypher.query.JcQueryResult;
 import iot.jcypher.query.api.IClause;
-import iot.jcypher.query.factories.clause.DO;
 import iot.jcypher.query.factories.clause.MATCH;
 import iot.jcypher.query.factories.clause.RETURN;
+import iot.jcypher.query.result.JcError;
 import iot.jcypher.query.values.JcNode;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -24,12 +27,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 /**
  *
  * @author Antonio Mateus
  */
-public class VerificacaoEmail extends HttpServlet {
+public class ExcluirConta extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -48,10 +50,10 @@ public class VerificacaoEmail extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet VerificacaoEmail</title>");
+            out.println("<title>Servlet ExcluirConta</title>");            
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet VerificacaoEmail at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet ExcluirConta at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -84,47 +86,30 @@ public class VerificacaoEmail extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         final String SERVER_ROOT_URI = "http://localhost:7474/";
-
-        final String usernameDB = "neo4j";
-        final String passwdDB = "dba";
-
+        final String user = "neo4j";
+        final String passwd = "dba";
         Properties props = new Properties();
         props.setProperty(DBProperties.SERVER_ROOT_URI, SERVER_ROOT_URI);
-
         IDBAccess remote
-                = DBAccessFactory.createDBAccess(DBType.REMOTE, props, usernameDB, passwdDB);
+                = DBAccessFactory.createDBAccess(DBType.REMOTE, props, user, passwd);
 
-        JcNode usuario = new JcNode("Usuario");
         String username = ControleLogin.getUsernameLogado();
-        
-        JcQuery query = new JcQuery();
-        query.setClauses(new IClause[]{
-            MATCH.node(usuario).label("Usuario")
-            .property("username").value(username),
+        JcNode usuario = new JcNode("Usuario");
+        JcQuery exclusao = new JcQuery();
+        exclusao.setClauses(new IClause[]{
+            MATCH.node(usuario).label("Usuario").property("username").value(username),
             RETURN.value(usuario)
         });
-        JcQueryResult result = remote.execute(query);
-        if (result.hasErrors()) {
-            System.out.println("Houve erro durante a obtencao do usuario logado");
-            return;
+        JcQueryResult resultado = remote.execute(exclusao);
+        List<GrNode> usuarios = resultado.resultOf(usuario);
+        GrNode usuarioAExcluir = usuarios.get(0);
+        usuarioAExcluir.remove();
+        Graph grafo = resultado.getGraph();
+        List<JcError> erros = grafo.store();
+        if (!erros.isEmpty()) {
+            System.out.println("Houve erros na remocao");
         }
-        List<GrNode> listaUsuarios = result.resultOf(usuario);
-        String codigoEnviado = listaUsuarios.get(0).getProperty("codigo_enviado").getValue().toString();
-        String codigoDigitado = request.getParameter("codigo");
-        
-        if (codigoEnviado.equals(codigoDigitado)) {
-            JcQuery update = new JcQuery();
-            update.setClauses(new IClause[]{
-                MATCH.node(usuario).label("Usuario")
-                .property("username").value(username),
-                DO.SET(usuario.property("validado")).to("sim")
-            });
-            remote.execute(update);
-            response.sendRedirect("pagina_inicial.jsp?msg=" + username);
-        }
-        else {
-            response.sendRedirect("verificacao_email.jsp?msg=falha");
-        }
+        response.sendRedirect("redirect.jsp?msg=sucesso");
     }
 
     /**
