@@ -293,7 +293,7 @@ public class CadastroPagina extends HttpServlet {
             MATCH.node(pagina).label("Pagina"),
             CREATE.node(criador).relation().out().type("CriaPagina").node(pagina)
         });
-        response.sendRedirect("pagina_generica.jsp?msg="+nomePagina+"_"+descricao);
+        response.sendRedirect("pagina_generica.jsp?msg="+nomePagina);
     }
 
     /**

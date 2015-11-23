@@ -206,6 +206,7 @@ public class CadastroUsuario extends HttpServlet {
                         .property("sobre").value(sobre)
                         .property("validado").value("nao")
                         .property("codigo_enviado").value(codigo)
+                        .property("interesses").value("00000000000000000000")
                     });
                     JcQueryResult result = remote.execute(query);
                     ControleLogin.setUsernameLogado(username);

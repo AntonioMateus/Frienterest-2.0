@@ -4,13 +4,44 @@
     Author     : Antonio Mateus
 --%>
 
+<%@page import="java.util.List"%>
+<%@page import="java.util.Properties"%>
+<%@page import="iot.jcypher.graph.GrNode"%>
+<%@page import="iot.jcypher.database.DBType"%>
+<%@page import="iot.jcypher.database.DBProperties"%>
+<%@page import="iot.jcypher.database.DBAccessFactory"%>
+<%@page import="iot.jcypher.database.IDBAccess"%>
+<%@page import="iot.jcypher.query.JcQuery"%>
+<%@page import="iot.jcypher.query.JcQueryResult"%>
+<%@page import="iot.jcypher.query.factories.clause.RETURN"%>
+<%@page import="iot.jcypher.query.values.JcNode"%>
+<%@page import="iot.jcypher.query.api.IClause"%>
+<%@page import="iot.jcypher.query.factories.clause.MATCH"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
     <head>
-        <%  String[] nomeDescricao = request.getParameter("msg").split("_");
-            String nomePagina = nomeDescricao[0];
-            String descricao = nomeDescricao[1]; %>
+        <%  String nomePagina = request.getParameter("msg");
+            String descricao = null; 
+            String SERVER_ROOT_URI = "http://localhost:7474/";
+            String usernameDB = "neo4j";
+            String passwdDB = "dba";
+            Properties props = new Properties();
+            props.setProperty(DBProperties.SERVER_ROOT_URI, SERVER_ROOT_URI);
+            IDBAccess remote = DBAccessFactory.createDBAccess(DBType.REMOTE, props, usernameDB, passwdDB);
+            JcNode pagina = new JcNode("Pagina");
+            JcQuery query = new JcQuery();
+            query.setClauses(new IClause[] {
+                MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
+                RETURN.value(pagina)
+            });
+            JcQueryResult resultado = remote.execute(query);
+            if (resultado.hasErrors()) {
+                %><h1><%out.println("Deu ruim");%></h1><%
+            }
+            List<GrNode> paginas = resultado.resultOf(pagina);
+            descricao = paginas.get(0).getProperty("descricao").getValue().toString();
+            %>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title><%out.print("Frienterest - "+nomePagina);%></title>
         <link href="css/foundation.css" rel="stylesheet" type="text/css"/>
@@ -39,6 +70,17 @@
             
             .top-bar{
             background: #2980b9
+            }
+            
+            .imgClass {
+                background-image: url(http://i.imgur.com/MXofX9A.png?1);
+                background-position: 0px 0px; 
+                background-repeat: no-repeat;
+                width: 136px;
+                height: 124px;
+                border: 0px;
+                cursor: pointer;
+                outline: 0;
             }
             
                 </style>
@@ -123,8 +165,21 @@
     </nav>
 
     <!-- Busca - Fim -->
-        <h1> <% out.println(nomePagina); %> </h1>
-        <h3> <% out.println("Descrição: " +descricao);%> </h3>
-        <br>
+    
+    <div class="row">
+        <div class="large-9 columns auth-plain">
+            <h1> <% out.println(nomePagina); %> </h1>
+            <h3> <% out.println("Descrição: " +descricao);%> </h3>
+            <br>
+        </div>
+        <div class="large-3 columns auth-plain">
+            <form action="DemonstrarInteresse" method="post">
+                <input name="nomePagina" value="<%=nomePagina%>" hidden="true" readonly="true">
+                <input type="submit" value=""  class="imgClass">
+                
+                <p style="text-align: left"> Demonstrar interesse </p>
+            </form>
+        </div>
+    </div>
     </body>
 </html>

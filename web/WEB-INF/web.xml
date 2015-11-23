@@ -43,6 +43,10 @@
         <servlet-class>utils.ControleLogin</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>ControleLogin</servlet-name>
+        <servlet-class>utils.DemonstrarInteresse</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>BuscaPessoas</servlet-name>
         <servlet-class>utils.BuscaPessoas</servlet-class>
     </servlet>
@@ -77,6 +81,10 @@
     <servlet-mapping>
         <servlet-name>ControleLogin</servlet-name>
         <url-pattern>/ControleLogin</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DemonstrarInteresse</servlet-name>
+        <url-pattern>/DemonstrarInteresse</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>BuscaPessoas</servlet-name>
