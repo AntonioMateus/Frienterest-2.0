@@ -24,7 +24,7 @@ import java.util.Properties;
  * @author Antonio Mateus
  */
 public class SugestaoPaginas {
-    private double distanciaEuclidiana (String interesses1, String interesses2) {
+    private static double distanciaEuclidiana (String interesses1, String interesses2) {
         String[] vetorInteresses1 = interesses1.split("");
         String[] vetorInteresses2 = interesses2.split("");
         
@@ -43,7 +43,7 @@ public class SugestaoPaginas {
         return Math.sqrt(soma);
     }
     
-    public List<GrNode> retornaPaginasMaisSemelhantes (int numeroPaginas) {
+    public static List<GrNode> retornaPaginasMaisSemelhantes (int numeroPaginas) {
         final String SERVER_ROOT_URI = "http://localhost:7474/";
         final String user = "neo4j";
         final String passwd = "dba";
@@ -72,7 +72,7 @@ public class SugestaoPaginas {
             atualizacaoDistancias = new JcQuery();
             atualizacaoDistancias.setClauses(new IClause[]{
                 MATCH.node(pagina).label("Pagina").property("nome").value(pagina1.getProperty("nome").getValue().toString()), 
-                DO.SET(pagina.property("distancia")).to(this.distanciaEuclidiana(interessesUsuario, pagina1.getProperty("interesses").getValue().toString()))
+                DO.SET(pagina.property("distancia")).to(distanciaEuclidiana(interessesUsuario, pagina1.getProperty("interesses").getValue().toString()))
             });
             remote.execute(atualizacaoDistancias);
         }
