@@ -194,11 +194,12 @@
         <!--</div> -->
 
         <script>
-            <%String buscaUsuario = ControleLogin.getUsernameLogado();%>
-            var buscaUsuario = "<%=buscaUsuario%>";
+            <%String usuarioLogado = ControleLogin.getUsernameLogado();%>
+            var usuarioLogado = "<%=usuarioLogado%>";
+            console.log(usuarioLogado);
 
             // The query
-            var query = {"statements": [{"statement": "MATCH (n)-[r]-() RETURN n, r" /*"MATCH p=(n)-->(m)<--(k),(n)--(k) RETURN p Limit 100"*/,
+            var query = {"statements": [{"statement": "MATCH (n)-[r]-() WHERE n.username ='" + usuarioLogado + "' RETURN n, r" /*"MATCH p=(n)-->(m)<--(k),(n)--(k) RETURN p Limit 100"*/,
                         "resultDataContents": ["graph", "row"]}]};
 
 //the helper function provided by neo4j documents

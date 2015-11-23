@@ -197,7 +197,7 @@ public class InicializacaoBancoDados extends HttpServlet {
                 List<GrNode> seguidos = result.resultOf(usuario);
 
                 Graph graph = result.getGraph();
-                for (int h = 0; h < 5*NUM_USUARIOS; h++) {
+                for (int h = 0; h < 15*NUM_USUARIOS; h++) {
                     Random rand = new Random();
                     int randomNum1 = rand.nextInt((NUM_USUARIOS - 1));
                     int randomNum2 = rand.nextInt((NUM_USUARIOS - 1));
