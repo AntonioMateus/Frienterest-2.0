@@ -175,7 +175,11 @@ public class InicializacaoBancoDados extends HttpServlet {
                 }                
             }
             response.sendRedirect("redirect.jsp");
-        } catch (Exception e) {
+        }
+        catch (NullPointerException n) {
+            response.sendRedirect("redirect.jsp?msg=bancoVazio");
+        }
+        catch (Exception e) {
             response.sendRedirect("redirect.jsp?msg=exclusaoIncorreta");
         }
         

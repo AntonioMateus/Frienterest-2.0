@@ -21,6 +21,10 @@ else if (request.getParameter("msg") != null && request.getParameter("msg").toSt
 else if (request.getParameter("msg") != null && request.getParameter("msg").toString().equals("exclusaoIncorreta")) {
     response.sendRedirect("index.htm?msg=exclusaoIncorreta");
 }
+else if (request.getParameter("msg") != null && request.getParameter("msg").toString().equals("bancoVazio")) {
+    response.sendRedirect("index.htm?msg=bancoVazio");
+}
 else {
     response.sendRedirect("index.htm?msg=false");
-} %>
+}
+%>
