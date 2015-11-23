@@ -66,10 +66,10 @@
 
         </style>
         <link rel="shortcut icon" href="frienterest.ico">
-        
+
         <script src="js/jquery-2.1.4.min.js"></script>
         <script src="http://d3js.org/d3.v3.js"></script>
-        
+
     </head>
     <body>
 
@@ -117,9 +117,11 @@
 
                 <!-- Right Nav Section -->
 
+                <%String username = ControleLogin.getUsernameLogado();%>
                 <ul class="right">
                     <li><form method="post" action="ExcluirConta"><input type="submit" value="Excluir conta" class="button"></form></li>
-                    <li><a href="criacao_pagina.jsp">Criar página</a></li>                
+                    <li><a href="pagina_usuario.jsp?msg=<%=username%>">Minha página</a></li>
+                    <li><a href="criacao_pagina.jsp">Criar página</a></li>               
 
                     <!-- <li class="has-dropdown">
     
@@ -442,25 +444,31 @@
                 </div>-->
 
         <script>
-            var buscaUsuario = <%ControleLogin.getUsernameLogado();%>;
-
+            <%String buscaUsuario = ControleLogin.getUsernameLogado();%>
+            var buscaUsuario = "<%=buscaUsuario%>";
 
             // The query
-            var query = {"statements": [{"statement": "MATCH p=(n)-->(m)<--(k),(n)--(k) RETURN p Limit 100",
+            var query = {"statements": [{"statement": "MATCH (n)-[r]-() RETURN n, r" /*"MATCH p=(n)-->(m)<--(k),(n)--(k) RETURN p Limit 100"*/,
                         "resultDataContents": ["graph", "row"]}]};
 
 //the helper function provided by neo4j documents
             function idIndex(a, id) {
                 for (var i = 0; i < a.length; i++) {
-                    if (a[i].id == id)
+                    if (a[i].id === id)
                         return i;
                 }
                 return null;
             }
 // jQuery ajax call
+            var token = "neo4j:dba";
+            var hash = btoa(token);
+            var authHeader = 'Basic ' + hash;
             var request = $.ajax({
                 type: "POST",
                 url: "http://localhost:7474/db/data/transaction/commit",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Authorization', authHeader);
+                },
                 accepts: {json: "application/json"},
                 dataType: "json",
                 contentType: "application/json",
@@ -470,285 +478,362 @@
                     // parsing the output of neo4j rest api
                     data.results[0].data.forEach(function (row) {
                         row.graph.nodes.forEach(function (n) {
-                            if (idIndex(nodes, n.id) == null) {
+                            nodes = [];
+                            if (idIndex(nodes, n.id) === null) {
                                 nodes.push({id: n.id, label: n.labels[0], title: n.properties.name});
                             }
                         });
+                        links = [{source: 0, target: 0, type: ""}];
                         links = links.concat(row.graph.relationships.map(function (r) {
                             // the neo4j documents has an error : replace start with source and end with target
-                            return {source: idIndex(nodes, r.startNode), target: idIndex(nodes, r.endNode), type: r.type};
+//                            console.log(idIndex(nodes, r.startNode).toString());
+//                            console.log(idIndex(nodes, r.endNode).toString());
+                            return {source: idIndex(nodes, r.startNode), target: 0/*idIndex(nodes, r.endNode)*/, type: r.type};
                         }));
                     });
-                    window.graph = {nodes: nodes, links: links};
-                    log.console(graph);
+                    graph = {nodes: nodes, links: links};
+//                    console.log(graph.nodes.toString());
+
                     // Now do something awesome with the graph!
 
+                    var mouseOverFunction = function (d) {
+                        var circle = d3.select(this);
+
+                        node
+                                .transition(500)
+                                .style("opacity", function (o) {
+                                    return isConnected(o, d) ? 1.0 : 0.2;
+                                })
+                                .style("fill", function (o) {
+                                    if (isConnectedAsTarget(o, d) && isConnectedAsSource(o, d)) {
+                                        fillcolor = 'green';
+                                    } else if (isConnectedAsSource(o, d)) {
+                                        fillcolor = 'red';
+                                    } else if (isConnectedAsTarget(o, d)) {
+                                        fillcolor = 'blue';
+                                    } else if (isEqual(o, d)) {
+                                        fillcolor = "hotpink";
+                                    } else {
+                                        fillcolor = '#000';
+                                    }
+                                    return fillcolor;
+                                });
+
+                        link
+                                .transition(500)
+                                .style("stroke-opacity", function (o) {
+                                    return o.source === d || o.target === d ? 1 : 0.2;
+                                })
+                                .transition(500)
+                                .attr("marker-end", function (o) {
+                                    return o.source === d || o.target === d ? "url(#arrowhead)" : "url()";
+                                });
+
+                        circle
+                                .transition(500)
+                                .attr("r", function () {
+                                    return 1.4 * node_radius(d)
+                                });
+                    }
+
+                    var mouseOutFunction = function () {
+                        var circle = d3.select(this);
+
+                        node
+                                .transition(500);
+
+                        link
+                                .transition(500);
+
+                        circle
+                                .transition(500)
+                                .attr("r", node_radius);
+                    }
+
+                    function isConnected(a, b) {
+                        return isConnectedAsTarget(a, b) || isConnectedAsSource(a, b) || a.index == b.index;
+                    }
+
+                    function isConnectedAsSource(a, b) {
+                        return linkedByIndex[a.index + "," + b.index];
+                    }
+
+                    function isConnectedAsTarget(a, b) {
+                        return linkedByIndex[b.index + "," + a.index];
+                    }
+
+                    function isEqual(a, b) {
+                        return a.index == b.index;
+                    }
+
+                    function tick() {
+                        link
+                                .attr("x1", function (d) {
+                                    return d.source.x;
+                                })
+                                .attr("y1", function (d) {
+                                    return d.source.y;
+                                })
+                                .attr("x2", function (d) {
+                                    return d.target.x;
+                                })
+                                .attr("y2", function (d) {
+                                    return d.target.y;
+                                });
+
+                        node
+                                .attr("transform", function (d) {
+                                    return "translate(" + d.x + "," + d.y + ")";
+                                });
+                    }
+
+                    function node_radius(d) {
+                        return Math.pow(40.0 * d.size, 1 / 3);
+                    }
+
+                    var width = 1000;
+                    var height = 500;
+
+                    var nodes = graph.nodes;
+                    console.log(graph.nodes);
+                    var links = graph.links;
+                    console.log(graph.links);
+
+                    var force = d3.layout.force()
+                            .nodes(nodes)
+                            .links(links)
+                            .charge(-3000)
+                            .friction(0.6)
+                            .gravity(0.6)
+                            .size([width, height])
+                            .start();
+
+                    var linkedByIndex = {};
+                    links.forEach(function (d) {
+                        linkedByIndex[d.source.index + "," + d.target.index] = true;
+                    });
+
+                    var svg = d3.select("body").append("svg")
+                            .attr("width", width)
+                            .attr("height", height);
+
+                    var link = svg.selectAll("line")
+                            .data(links)
+                            .enter().append("line")
+
+                    var node = svg.selectAll(".node")
+                            .data(nodes)
+                            .enter().append("g")
+                            .attr("class", "node")
+                            .call(force.drag);
+
+                    node
+                            .append("circle")
+                            .attr("r", node_radius)
+                            .on("mouseover", mouseOverFunction)
+                            .on("mouseout", mouseOutFunction);
+
+                    svg
+                            .append("marker")
+                            .attr("id", "arrowhead")
+                            .attr("refX", 6 + 7) // Controls the shift of the arrow head along the path
+                            .attr("refY", 2)
+                            .attr("markerWidth", 6)
+                            .attr("markerHeight", 4)
+                            .attr("orient", "auto")
+                            .append("path")
+                            .attr("d", "M 0,0 V 4 L6,2 Z");
+
+                    link
+                            .attr("marker-end", "url()");
+
+                    force
+                            .on("tick", tick);
+
+                },
+                error: function (xhr, err, msg) {
+                    console.log(xhr);
+                    console.log(err);
+                    console.log(msg);
                 }
 
             });
+//            console.log(graph.links[0].toString());
         </script>
+
+
+        <!--        <script>
+                    console.log("Hello2");
+                    data = {
+                        nodes: [
+                            {size: 10},
+                            {size: 5},
+                            {size: 2},
+                            {size: 3},
+                            {size: 30},
+                            {size: 40}
+                        ],
+                        links: [
+                            {source: 0, target: 1},
+                            {source: 0, target: 2},
+                            {source: 1, target: 0},
+                            {source: 3, target: 0},
+                            {source: 4, target: 1}
+                        ]
+                    }
         
-        <script>
-            data = {
-                nodes: [
-                    {size: 10},
-                    {size: 5},
-                    {size: 2},
-                    {size: 3},
-                    {size: 30},
-                    {size: 40}
-                ],
-                links: [
-                    {source: 0, target: 1},
-                    {source: 0, target: 2},
-                    {source: 1, target: 0},
-                    {source: 3, target: 0},
-                    {source: 4, target: 1}
-                ]
-            }
-
-            var mouseOverFunction = function (d) {
-                var circle = d3.select(this);
-
-                node
-                        .transition(500)
-                        .style("opacity", function (o) {
-                            return isConnected(o, d) ? 1.0 : 0.2;
-                        })
-                        .style("fill", function (o) {
-                            if (isConnectedAsTarget(o, d) && isConnectedAsSource(o, d)) {
-                                fillcolor = 'green';
-                            } else if (isConnectedAsSource(o, d)) {
-                                fillcolor = 'red';
-                            } else if (isConnectedAsTarget(o, d)) {
-                                fillcolor = 'blue';
-                            } else if (isEqual(o, d)) {
-                                fillcolor = "hotpink";
-                            } else {
-                                fillcolor = '#000';
-                            }
-                            return fillcolor;
-                        });
-
-                link
-                        .transition(500)
-                        .style("stroke-opacity", function (o) {
-                            return o.source === d || o.target === d ? 1 : 0.2;
-                        })
-                        .transition(500)
-                        .attr("marker-end", function (o) {
-                            return o.source === d || o.target === d ? "url(#arrowhead)" : "url()";
-                        });
-
-                circle
-                        .transition(500)
-                        .attr("r", function () {
-                            return 1.4 * node_radius(d)
-                        });
-            }
-
-            var mouseOutFunction = function () {
-                var circle = d3.select(this);
-
-                node
-                        .transition(500);
-
-                link
-                        .transition(500);
-
-                circle
-                        .transition(500)
-                        .attr("r", node_radius);
-            }
-
-            function isConnected(a, b) {
-                return isConnectedAsTarget(a, b) || isConnectedAsSource(a, b) || a.index == b.index;
-            }
-
-            function isConnectedAsSource(a, b) {
-                return linkedByIndex[a.index + "," + b.index];
-            }
-
-            function isConnectedAsTarget(a, b) {
-                return linkedByIndex[b.index + "," + a.index];
-            }
-
-            function isEqual(a, b) {
-                return a.index == b.index;
-            }
-
-            function tick() {
-                link
-                        .attr("x1", function (d) {
-                            return d.source.x;
-                        })
-                        .attr("y1", function (d) {
-                            return d.source.y;
-                        })
-                        .attr("x2", function (d) {
-                            return d.target.x;
-                        })
-                        .attr("y2", function (d) {
-                            return d.target.y;
-                        });
-
-                node
-                        .attr("transform", function (d) {
-                            return "translate(" + d.x + "," + d.y + ")";
-                        });
-            }
-
-            function node_radius(d) {
-                return Math.pow(40.0 * d.size, 1 / 3);
-            }
-
-            var width = 1000;
-            var height = 500;
-
-            var nodes = data.nodes
-            var links = data.links
-
-            var force = d3.layout.force()
-                    .nodes(nodes)
-                    .links(links)
-                    .charge(-3000)
-                    .friction(0.6)
-                    .gravity(0.6)
-                    .size([width, height])
-                    .start();
-
-            var linkedByIndex = {};
-            links.forEach(function (d) {
-                linkedByIndex[d.source.index + "," + d.target.index] = true;
-            });
-
-            var svg = d3.select("body").append("svg")
-                    .attr("width", width)
-                    .attr("height", height);
-
-            var link = svg.selectAll("line")
-                    .data(links)
-                    .enter().append("line")
-
-            var node = svg.selectAll(".node")
-                    .data(nodes)
-                    .enter().append("g")
-                    .attr("class", "node")
-                    .call(force.drag);
-
-            node
-                    .append("circle")
-                    .attr("r", node_radius)
-                    .on("mouseover", mouseOverFunction)
-                    .on("mouseout", mouseOutFunction);
-
-            svg
-                    .append("marker")
-                    .attr("id", "arrowhead")
-                    .attr("refX", 6 + 7) // Controls the shift of the arrow head along the path
-                    .attr("refY", 2)
-                    .attr("markerWidth", 6)
-                    .attr("markerHeight", 4)
-                    .attr("orient", "auto")
-                    .append("path")
-                    .attr("d", "M 0,0 V 4 L6,2 Z");
-
-            link
-                    .attr("marker-end", "url()");
-
-            force
-                    .on("tick", tick);
-
-        </script>
-        <!--    <div id="graph3">
-                <script src="//d3js.org/d3.v3.min.js"></script>
-                <script>
+                    var mouseOverFunction = function (d) {
+                        var circle = d3.select(this);
         
-                    var width = 960,
-                            height = 500;
+                        node
+                                .transition(500)
+                                .style("opacity", function (o) {
+                                    return isConnected(o, d) ? 1.0 : 0.2;
+                                })
+                                .style("fill", function (o) {
+                                    if (isConnectedAsTarget(o, d) && isConnectedAsSource(o, d)) {
+                                        fillcolor = 'green';
+                                    } else if (isConnectedAsSource(o, d)) {
+                                        fillcolor = 'red';
+                                    } else if (isConnectedAsTarget(o, d)) {
+                                        fillcolor = 'blue';
+                                    } else if (isEqual(o, d)) {
+                                        fillcolor = "hotpink";
+                                    } else {
+                                        fillcolor = '#000';
+                                    }
+                                    return fillcolor;
+                                });
         
-                    var color = d3.scale.category20();
+                        link
+                                .transition(500)
+                                .style("stroke-opacity", function (o) {
+                                    return o.source === d || o.target === d ? 1 : 0.2;
+                                })
+                                .transition(500)
+                                .attr("marker-end", function (o) {
+                                    return o.source === d || o.target === d ? "url(#arrowhead)" : "url()";
+                                });
+        
+                        circle
+                                .transition(500)
+                                .attr("r", function () {
+                                    return 1.4 * node_radius(d)
+                                });
+                    }
+        
+                    var mouseOutFunction = function () {
+                        var circle = d3.select(this);
+        
+                        node
+                                .transition(500);
+        
+                        link
+                                .transition(500);
+        
+                        circle
+                                .transition(500)
+                                .attr("r", node_radius);
+                    }
+        
+                    function isConnected(a, b) {
+                        return isConnectedAsTarget(a, b) || isConnectedAsSource(a, b) || a.index == b.index;
+                    }
+        
+                    function isConnectedAsSource(a, b) {
+                        return linkedByIndex[a.index + "," + b.index];
+                    }
+        
+                    function isConnectedAsTarget(a, b) {
+                        return linkedByIndex[b.index + "," + a.index];
+                    }
+        
+                    function isEqual(a, b) {
+                        return a.index == b.index;
+                    }
+        
+                    function tick() {
+                        link
+                                .attr("x1", function (d) {
+                                    return d.source.x;
+                                })
+                                .attr("y1", function (d) {
+                                    return d.source.y;
+                                })
+                                .attr("x2", function (d) {
+                                    return d.target.x;
+                                })
+                                .attr("y2", function (d) {
+                                    return d.target.y;
+                                });
+        
+                        node
+                                .attr("transform", function (d) {
+                                    return "translate(" + d.x + "," + d.y + ")";
+                                });
+                    }
+        
+                    function node_radius(d) {
+                        return Math.pow(40.0 * d.size, 1 / 3);
+                    }
+        
+                    var width = 1000;
+                    var height = 500;
+        
+                    var nodes = window.graph.nodes;
+                    var links = window.graph.links;
         
                     var force = d3.layout.force()
-                            .charge(-120)
-                            .linkDistance(30)
-                            .size([width, height]);
+                            .nodes(nodes)
+                            .links(links)
+                            .charge(-3000)
+                            .friction(0.6)
+                            .gravity(0.6)
+                            .size([width, height])
+                            .start();
         
-                    var svg = d3.select("graph3").append("svg")
+                    var linkedByIndex = {};
+                    links.forEach(function (d) {
+                        linkedByIndex[d.source.index + "," + d.target.index] = true;
+                    });
+        
+                    var svg = d3.select("body").append("svg")
                             .attr("width", width)
                             .attr("height", height);
         
-                    d3.json("miserables.json", function (error, graph) {
-                        if (error)
-                            throw error;
+                    var link = svg.selectAll("line")
+                            .data(links)
+                            .enter().append("line")
         
-                        force
-                                .nodes(graph.nodes)
-                                .links(graph.links)
-                                .start();
+                    var node = svg.selectAll(".node")
+                            .data(nodes)
+                            .enter().append("g")
+                            .attr("class", "node")
+                            .call(force.drag);
         
-                        var link = svg.selectAll(".link")
-                                .data(graph.links)
-                                .enter().append("line")
-                                .attr("class", "link")
-                                .style("stroke-width", function (d) {
-                                    return Math.sqrt(d.value);
-                                });
+                    node
+                            .append("circle")
+                            .attr("r", node_radius)
+                            .on("mouseover", mouseOverFunction)
+                            .on("mouseout", mouseOutFunction);
         
-                        var node = svg.selectAll(".node")
-                                .data(graph.nodes)
-                                .enter().append("circle")
-                                .attr("class", "node")
-                                .attr("r", 5)
-                                .style("fill", function (d) {
-                                    return color(d.group);
-                                })
-                                .call(force.drag);
+                    svg
+                            .append("marker")
+                            .attr("id", "arrowhead")
+                            .attr("refX", 6 + 7) // Controls the shift of the arrow head along the path
+                            .attr("refY", 2)
+                            .attr("markerWidth", 6)
+                            .attr("markerHeight", 4)
+                            .attr("orient", "auto")
+                            .append("path")
+                            .attr("d", "M 0,0 V 4 L6,2 Z");
         
-                        node.append("title")
-                                .text(function (d) {
-                                    return d.name;
-                                });
+                    link
+                            .attr("marker-end", "url()");
         
-                        force.on("tick", function () {
-                            link.attr("x1", function (d) {
-                                return d.source.x;
-                            })
-                                    .attr("y1", function (d) {
-                                        return d.source.y;
-                                    })
-                                    .attr("x2", function (d) {
-                                        return d.target.x;
-                                    })
-                                    .attr("y2", function (d) {
-                                        return d.target.y;
-                                    });
+                    force
+                            .on("tick", tick);
         
-                            node.attr("cx", function (d) {
-                                return d.x;
-                            })
-                                    .attr("cy", function (d) {
-                                        return d.y;
-                                    });
-                        });
-                    });
-                    var some_data2 =
-                            {
-                                "nodes":
-                                        [
-                                            {name: "Peter", label: "Person", id: 1},
-                                            {name: "Michael", label: "Person", id: 2},
-                                            {name: "Neo4j", label: "Database", id: 3}
-                                        ],
-                                "edges":
-                                        [
-                                            {source: 1, target: 2, type: "KNOWS", since: 2010},
-                                            {source: 1, target: 3, type: "FOUNDED"},
-                                            {source: 2, target: 3, type: "WORKS_ON"}
-                                        ]
-                            }
-                </script>
-            </div>-->
-
+                </script>-->
     </body>
 </html>
