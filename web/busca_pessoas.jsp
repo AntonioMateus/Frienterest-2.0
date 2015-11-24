@@ -4,6 +4,7 @@
     Author     : andrew
 --%>
 
+<%@page import="utils.ControleLogin"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.ArrayList"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -70,170 +71,164 @@
 
                 </style>
                 <link rel="shortcut icon" href="frienterest.ico">
-                </head>
+                    </head>
 
-                <body>
-                    <!-- Busca -->
+                    <body>
 
-                    <nav class="top-bar" data-topbar role="navigation">
-                        <form method="POST" action="BuscaPessoas">
-                            <ul class="title-area">
+                        <!-- Busca -->
 
-                                <li class="name">
+                        <nav class="top-bar" data-topbar role="navigation">
+                            <form method="POST" action="BuscaPessoas">
+                                <ul class="title-area">
 
-                                    <h1><a href="pagina_inicial.jsp">Frienterest &nbsp;</a></h1>
+                                    <li class="name">
 
-                                </li>
+                                        <h1><a href="pagina_inicial.jsp">Frienterest &nbsp;</a></h1>
 
-                                <li class="has-form">
+                                    </li>
 
-                                    <div class="row collapse">
+                                    <li class="has-form">
 
-                                        <div class="large-8 small-9 columns">
+                                        <div class="large-7 small-8 columns">
 
-                                            <input type="text" name="pessoa" placeholder="Encontre Pessoas">
+                                            <input type="text" name="pessoa" placeholder="Pessoas">
+
+                                        </div>
+
+                                        <div class="large-5 small-4 columns">
+
+                                            <input type="submit" class="button" value="Pesquisar"></input>
 
                                         </div>
 
-                                        <div class="large-4 small-3 columns">
+                                    </li>
+                                </ul>
+                            </form>
 
-                                            <input type="submit" class="alert button expand" value="Pesquisar"></input>
+                            <section class="top-bar-section">
 
-                                        </div>
+                                <!-- Right Nav Section -->
+                                <%String username = ControleLogin.getUsernameLogado();%>
+                                <ul class="right">
+                                    <li><a href="pagina_usuario.jsp?msg=<%=username%>">Minha página</a></li>
+                                    <li><a href="criacao_pagina.jsp">Criar página</a></li>                
+
+                                    <li class="has-dropdown">
+
+                                        <a href="#">Opções</a>
+
+                                        <ul class="dropdown">
+                                            <li>
+                                                <form method="post" action="ExcluirConta">
+                                                    <input type="submit" value="Excluir conta" class="alert button">
+                                                </form>
+                                            </li>
+                                        </ul>
+
+                                    </li>
+
+                                    <li><a href="redirect.jsp">Sair</a></li>
+
+                                </ul>
+
+
+                                <!-- Left Nav Section -->
+
+                                <ul class="left">
+
+
+                                </ul>
+
+                            </section>
+
+                        </nav>
+
+                        <h2 align="center">Pessoas Interessantes</h2>
+
+                        <!-- Exibicao da busca -->
+                        <div class="row results">
+
+                            <div class="large-12 columns ">
+
+                                <div class="row">
+
+                                    <div class="large-9 columns">
+
+                                        <h3> Resultado da busca: </h3>
 
                                     </div>
-
-                                </li>
-
-                        </form>
-                        <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
-
-                        <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
-
-                        </ul>
-
-                        <section class="top-bar-section">
-
-                            <!-- Right Nav Section -->
-
-                            <ul class="right">
-
-                                <li><a href="redirect.jsp">Sair</a></li>
-
-                                <li class="has-dropdown">
-
-                                    <a href="#">Opções</a>
-
-                                    <ul class="dropdown">
-
-                                        <li><a href="pagina_inicial.jsp">Home</a></li>
-
-                                        <li><a href="redirect.jsp">Conta</a></li>
-
-                                    </ul>
-
-                                </li>
-
-                            </ul>
-
-
-                            <!-- Left Nav Section -->
-
-                            <ul class="left">
-
-
-                            </ul>
-
-                        </section>
-
-                    </nav>
-
-                    <!-- Busca - Fim -->
-
-                    <h2 align="center">Pessoas Interessantes</h2>
-
-                    <!-- Exibicao da busca -->
-                    <div class="row results">
-
-                        <div class="large-12 columns ">
-
-                            <div class="row">
-
-                                <div class="large-9 columns">
-
-                                    <h3> Resultado da busca: </h3>
 
                                 </div>
 
-                            </div>
+                                <div class="search-results">
 
-                            <div class="search-results">
+                                    <%
+                                        List pessoasEncontradas = new ArrayList();
 
-                                <%
-                                    List pessoasEncontradas = new ArrayList();
+                                        pessoasEncontradas = (ArrayList) request.getAttribute("pessoasEncontradas");
 
-                                    pessoasEncontradas = (ArrayList) request.getAttribute("pessoasEncontradas");
+                                        if (pessoasEncontradas != null && pessoasEncontradas.size() > 0) {
 
-                                    if (pessoasEncontradas != null && pessoasEncontradas.size() > 0) {
+                                            for (int i = 0; i < pessoasEncontradas.size(); i++) {
 
-                                        for (int i = 0; i < pessoasEncontradas.size(); i++) {
+                                                List pessoas = (List) pessoasEncontradas.get(i);
 
-                                            List pessoas = (List) pessoasEncontradas.get(i);
+                                    %>
 
-                                %>
+                                    <div class="row ">
 
-                                <div class="row ">
+                                        <div class="large-2 columns">
 
-                                    <div class="large-2 columns">
+                                            <a href="#"> <span> </span><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Gnome-stock_person.svg/2000px-Gnome-stock_person.svg.png" alt="book cover" class=" thumbnail"></a>
 
-                                        <a href="#"> <span> </span><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Gnome-stock_person.svg/2000px-Gnome-stock_person.svg.png" alt="book cover" class=" thumbnail"></a>
+                                        </div>
 
-                                    </div>
-
-                                    <div class="large-10 columns">
-
-                                        <div class="row">
-
-                                            <div class=" large-9 columns">
-
-                                                <h5><%= pessoas.get(2)%></h5>
-
-                                                <p><a href="#"> Página </a> | <a href="#"> Interesses </a></p>
-
-                                            </div>
-
-                                            <div class=" large-3 columns">
-
-                                                <a href="#"  class="button  expand medium"><span>Enviar mensagem</span> </a>
-
-                                                <a href="#"  class="button  expand medium"><span>Adicionar como amigo(a)</span></a> 
-
-                                            </div>
+                                        <div class="large-10 columns">
 
                                             <div class="row">
 
-                                                <div class=" large-12 columns">
+                                                <div class=" large-9 columns">
 
-                                                    <ul class="large-block-grid-2">
+                                                    <h5><%= pessoas.get(2)%></h5>
 
-                                                        <li>
+                                                    <p><a href="#"> Página </a> | <a href="#"> Interesses </a></p>
 
-                                                            <ul>
+                                                </div>
 
-                                                                <li><strong>Nome: </strong> <%= pessoas.get(0)%> </li>
+                                                <div class=" large-3 columns">
 
-                                                                <li><strong>Sobrenome:</strong> <%= pessoas.get(1)%> </li>
+                                                    <a href="#"  class="button  expand medium"><span>Enviar mensagem</span> </a>
 
-                                                                <li><strong>Interesses em comum: </strong> Nenhum </li>
+                                                    <a href="#"  class="button  expand medium"><span>Adicionar como amigo(a)</span></a> 
 
-                                                                <li><strong>Amizades em comum:</strong> Nenhuma </li>
+                                                </div>
 
-                                                            </ul>
+                                                <div class="row">
 
-                                                        </li>
+                                                    <div class=" large-12 columns">
+
+                                                        <ul class="large-block-grid-2">
+
+                                                            <li>
+
+                                                                <ul>
+
+                                                                    <li><strong>Nome: </strong> <%= pessoas.get(0)%> </li>
+
+                                                                    <li><strong>Sobrenome:</strong> <%= pessoas.get(1)%> </li>
+
+                                                                    <li><strong>Interesses em comum: </strong> Nenhum </li>
+
+                                                                    <li><strong>Amizades em comum:</strong> Nenhuma </li>
+
+                                                                </ul>
+
+                                                            </li>
 
 
-                                                    </ul>
+                                                        </ul>
+
+                                                    </div>
 
                                                 </div>
 
@@ -241,31 +236,29 @@
 
                                         </div>
 
-                                    </div>
+                                        <hr>
 
-                                    <hr>
+                                    </div>         
 
-                                </div>         
+                                </div>
+                                <%                    }
 
+                                } else {
+
+                                %>
+
+                                <h4 align="center">
+                                    Nenhum resultado encontrado.
+                                </h4>
+
+                                <%}%>
+                                <!--
+                                            <a href="#" class="button right"> show more results &raquo;</a>
+                                -->
                             </div>
-                            <%                    }
 
-                            } else {
-
-                            %>
-
-                            <h4 align="center">
-                                Nenhum resultado encontrado.
-                            </h4>
-
-                            <%}%>
-                            <!--
-                                        <a href="#" class="button right"> show more results &raquo;</a>
-                            -->
                         </div>
+                        <!-- Exibicao da busca - Fim -->
 
-                    </div>
-                    <!-- Exibicao da busca - Fim -->
-
-                </body>
+                    </body>
             </html>
