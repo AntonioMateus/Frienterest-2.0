@@ -20,6 +20,7 @@ import iot.jcypher.query.values.JcNode;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Properties;
@@ -36,7 +37,16 @@ import org.neo4j.graphdb.Label;
  * @author andrew
  */
 public class BuscaPessoas extends HttpServlet {
-
+    private static List<GrNode> usuariosEncontrados;
+    private static List<GrNode> paginasEncontradas;
+    
+    public static List<GrNode> getUsuariosEncontrados() {
+        return usuariosEncontrados;
+    }
+    
+    public static List<GrNode> getPaginasEncontradas() {
+        return paginasEncontradas;
+    }
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -95,6 +105,54 @@ public class BuscaPessoas extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String termoBusca = request.getParameter("pessoa");
+        String SERVER_ROOT_URI = "http://localhost:7474/";
+        String usernameDB = "neo4j";
+        String passwdDB = "dba";
+        Properties props = new Properties();
+        props.setProperty(DBProperties.SERVER_ROOT_URI, SERVER_ROOT_URI);
+        IDBAccess remote = DBAccessFactory.createDBAccess(DBType.REMOTE, props, usernameDB, passwdDB);
+        JcNode usuario = new JcNode("Usuario");
+        JcNode palavraChave = new JcNode("PalavraChave");
+        JcNode pagina = new JcNode("Pagina");
+                            
+        JcQuery buscaUsuarios = new JcQuery(); 
+        buscaUsuarios.setClauses(new IClause[] {
+            MATCH.node(usuario).label("Usuario").property("nome").value(termoBusca),
+            RETURN.value(usuario)
+        });
+        JcQueryResult resultado = remote.execute(buscaUsuarios);
+        if (resultado.hasErrors()) {
+            System.out.print("Houve problemas durante a busca de usuarios");
+        }
+        usuariosEncontrados = resultado.resultOf(usuario);
+        paginasEncontradas = new LinkedList<>(); 
+        JcQuery buscaPaginas = new JcQuery(); 
+        buscaPaginas.setClauses(new IClause[] {
+            MATCH.node(pagina).label("Pagina").property("nome").value(termoBusca),
+            RETURN.value(pagina)
+        });
+        resultado = remote.execute(buscaPaginas);
+        if (resultado.hasErrors()) {
+            System.out.println("Houve problemas durante a primeira busca de paginas");
+        }
+        List<GrNode> parte1 = resultado.resultOf(pagina);
+        for (GrNode paginaEncontrada:parte1) {
+           paginasEncontradas.add(paginaEncontrada);
+        }    
+        buscaPaginas = new JcQuery();
+        buscaPaginas.setClauses(new IClause[] {
+            MATCH.node(pagina).label("Pagina").relation().out().type("PossuiPalavraChave").node(palavraChave).label("PalavraChave").property("nome").value(termoBusca),
+            RETURN.value(pagina)
+        });
+        resultado = remote.execute(buscaPaginas);
+        if (resultado.hasErrors()) {
+            System.out.println("Houve problemas durante a segunda busca de paginas");
+        }
+        List<GrNode> parte2 = resultado.resultOf(pagina);
+        for (GrNode paginaEncontrada:parte2) {
+            if (!paginasEncontradas.contains(paginaEncontrada))
+                paginasEncontradas.add(paginaEncontrada);
+        }
         response.sendRedirect("busca_pessoas.jsp?msg="+termoBusca);
     }
 

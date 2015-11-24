@@ -4,6 +4,7 @@
     Author     : Antonio Mateus
 --%>
 
+<%@page import="utils.BuscaPessoas"%>
 <%@page import="java.util.LinkedList"%>
 <%@page import="utils.ControleLogin"%>
 <%@page import="java.util.List"%>
@@ -154,57 +155,7 @@
                             </section>
 
                         </nav>
-                        <%  
-                            String SERVER_ROOT_URI = "http://localhost:7474/";
-                            String usernameDB = "neo4j";
-                            String passwdDB = "dba";
-                            String termoBusca = request.getParameter("msg");
-                            Properties props = new Properties();
-                            props.setProperty(DBProperties.SERVER_ROOT_URI, SERVER_ROOT_URI);
-                            IDBAccess remote = DBAccessFactory.createDBAccess(DBType.REMOTE, props, usernameDB, passwdDB);
-                            JcNode usuario = new JcNode("Usuario");
-                            JcNode palavraChave = new JcNode("PalavraChave");
-                            JcNode pagina = new JcNode("Pagina");
-                            
-                            JcQuery buscaUsuarios = new JcQuery(); 
-                            buscaUsuarios.setClauses(new IClause[] {
-                                MATCH.node(usuario).label("Usuario").property("nome").value(termoBusca),
-                                RETURN.value(usuario)
-                            });
-                            JcQueryResult resultado = remote.execute(buscaUsuarios);
-                            if (resultado.hasErrors()) {
-                                out.print("<script>alert('Houve problemas durante a busca de usuarios')</script>");
-                            }
-                            List<GrNode> usuariosEncontrados = resultado.resultOf(usuario);
-                            List<GrNode> paginasEncontradas = new LinkedList<>(); 
-                            JcQuery buscaPaginas = new JcQuery(); 
-                            buscaPaginas.setClauses(new IClause[] {
-                                MATCH.node(pagina).label("Pagina").property("nome").value(termoBusca),
-                                RETURN.value(pagina)
-                            });
-                            resultado = remote.execute(buscaPaginas);
-                            if (resultado.hasErrors()) {
-                                out.print("<script>alert('Houve problemas durante a primeira busca de paginas')</script>");
-                            }
-                            List<GrNode> parte1 = resultado.resultOf(pagina);
-                            for (GrNode paginaEncontrada:parte1) {
-                                paginasEncontradas.add(paginaEncontrada);
-                            }    
-                            buscaPaginas = new JcQuery();
-                            buscaPaginas.setClauses(new IClause[] {
-                                MATCH.node(pagina).label("Pagina").relation().out().type("PossuiPalavraChave").node(palavraChave).label("PalavraChave").property("nome").value(termoBusca),
-                                RETURN.value(pagina)
-                            });
-                            resultado = remote.execute(buscaPaginas);
-                            if (resultado.hasErrors()) {
-                                out.print("<script>alert('Houve problemas durante a segunda busca de paginas')</script>");
-                            }
-                            List<GrNode> parte2 = resultado.resultOf(pagina);
-                            for (GrNode paginaEncontrada:parte2) {
-                                if (!paginasEncontradas.contains(paginaEncontrada))
-                                    paginasEncontradas.add(paginaEncontrada);
-                            }                            
-                        %>
+                        
                         <h2 align="center">Pessoas Interessantes</h2>
 
                         <!-- Exibicao da busca -->
@@ -224,7 +175,9 @@
 
                                 <div class="search-results">
 
-                                    <%  if (usuariosEncontrados.size() == 0) {
+                                    <%  List<GrNode> usuariosEncontrados = BuscaPessoas.getUsuariosEncontrados();
+                                        List<GrNode> paginasEncontradas = BuscaPessoas.getPaginasEncontradas();
+                                        if (usuariosEncontrados.size() == 0) {
                                         %><h3><%out.print("Nao foram encontrados usuarios com o nome pesquisado.");%></h3><%
                                         } 
                                         else {

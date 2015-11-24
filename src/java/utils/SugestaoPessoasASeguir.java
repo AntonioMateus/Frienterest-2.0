@@ -64,55 +64,66 @@ public class SugestaoPessoasASeguir {
             RETURN.value(usuarioSeguidor)
         });
         String interessesUsuarioSeguidor = remote.execute(obtencaoUsuarioSeguidor).resultOf(usuarioSeguidor).get(0).getProperty("interesses").getValue().toString();
-        JcQuery obtencaoUsuarios = new JcQuery();
-        obtencaoUsuarios.setClauses(new IClause[] {
-            MATCH.node(usuarioSeguido).label("Pagina"),
-            RETURN.value(usuarioSeguido)
-        });
-        List<GrNode> usuarios = remote.execute(obtencaoUsuarios).resultOf(usuarioSeguido);
-        JcQuery atualizaDistancia;
-        for (GrNode usuario: usuarios) {
-            atualizaDistancia = new JcQuery(); 
-            atualizaDistancia.setClauses(new IClause[] {
-                MATCH.node(usuarioSeguido).label("Usuario").property("username").value(usuario.getProperty("username").getValue().toString()),
-                DO.SET(usuarioSeguido.property("distancia")).to(distanciaEuclidiana(usuario.getProperty("interesses").getValue().toString(),interessesUsuarioSeguidor))
+        if (interessesUsuarioSeguidor.equals("00000000000000000000")) {
+            JcQuery obtencaoUsuarios = new JcQuery();
+            obtencaoUsuarios.setClauses(new IClause[] {
+                MATCH.node(usuarioSeguido).label("Usuario"),
+                RETURN.value(usuarioSeguido)
             });
-            remote.execute(atualizaDistancia);
-        }
-        JcQuery obtencaoUsuariosAtualizados = new JcQuery(); 
-        obtencaoUsuariosAtualizados.setClauses(new IClause[] {
-            MATCH.node(usuarioSeguido).label("Usuario"),
-            RETURN.value(usuarioSeguido).ORDER_BY_DESC("distancia")
-        });
-        List<GrNode> usuariosPossivelmenteInteressantes = remote.execute(obtencaoUsuariosAtualizados).resultOf(usuarioSeguido); 
-        List<GrNode> usuariosInteressantes = new LinkedList<>(); 
-        JcQuery verificaSeJahSegue; 
-        int contadorPessoas = 0; 
-        JcRelation relacao = new JcRelation("Segue");
-        for (GrNode usuario: usuariosPossivelmenteInteressantes) {
-            if (!usuario.getProperty("username").getValue().toString().equals(usernameSeguidor) && contadorPessoas < numeroPessoas) {
-                verificaSeJahSegue = new JcQuery();
-                verificaSeJahSegue.setClauses(new IClause[] {
-                    MATCH.node(usuarioSeguidor).label("Usuario").property("username").value(usernameSeguidor).relation(relacao).out().node(usuarioSeguido).label("Usuario")
-                    .property("username").value(usuario.getProperty("username").getValue().toString()),
-                    RETURN.value(relacao)
-                }); 
-                List<GrRelation> relacoes = remote.execute(verificaSeJahSegue).resultOf(relacao);
-                if (relacoes.isEmpty()) {
-                    usuariosInteressantes.add(usuario);
-                    contadorPessoas++;
+            List<GrNode> usuarios = remote.execute(obtencaoUsuarios).resultOf(usuarioSeguido);
+            JcQuery atualizaDistancia;
+            for (GrNode usuario: usuarios) {
+                atualizaDistancia = new JcQuery(); 
+                atualizaDistancia.setClauses(new IClause[] {
+                    MATCH.node(usuarioSeguido).label("Usuario").property("username").value(usuario.getProperty("username").getValue().toString()),
+                    DO.SET(usuarioSeguido.property("distancia")).to(distanciaEuclidiana(usuario.getProperty("interesses").getValue().toString(),interessesUsuarioSeguidor))
+                });
+                remote.execute(atualizaDistancia);
+            }
+            JcQuery obtencaoUsuariosAtualizados = new JcQuery(); 
+            obtencaoUsuariosAtualizados.setClauses(new IClause[] {
+                MATCH.node(usuarioSeguido).label("Usuario"),
+                RETURN.value(usuarioSeguido).ORDER_BY_DESC("distancia")
+            });
+            List<GrNode> usuariosPossivelmenteInteressantes = remote.execute(obtencaoUsuariosAtualizados).resultOf(usuarioSeguido); 
+            List<GrNode> usuariosInteressantes = new LinkedList<>(); 
+            JcQuery verificaSeJahSegue; 
+            int contadorPessoas = 0; 
+            JcRelation relacao = new JcRelation("Segue");
+            for (GrNode usuario: usuariosPossivelmenteInteressantes) {
+                if (!usuario.getProperty("username").getValue().toString().equals(usernameSeguidor) && contadorPessoas < numeroPessoas) {
+                    verificaSeJahSegue = new JcQuery();
+                    verificaSeJahSegue.setClauses(new IClause[] {
+                        MATCH.node(usuarioSeguidor).label("Usuario").property("username").value(usernameSeguidor).relation(relacao).out().node(usuarioSeguido).label("Usuario")
+                        .property("username").value(usuario.getProperty("username").getValue().toString()),
+                        RETURN.value(relacao)
+                    }); 
+                    List<GrRelation> relacoes = remote.execute(verificaSeJahSegue).resultOf(relacao);
+                    if (relacoes.isEmpty()) {
+                        usuariosInteressantes.add(usuario);
+                        contadorPessoas++;
+                    }
+                }
+                else if (contadorPessoas >= numeroPessoas) {
+                    break;
                 }
             }
-            else if (contadorPessoas >= numeroPessoas) {
-                break;
-            }
+            atualizaDistancia = new JcQuery(); 
+            atualizaDistancia.setClauses(new IClause[] {
+                MATCH.node(usuarioSeguido).label("Usuario"),
+                DO.SET(usuarioSeguido.property("distancia")).to(0)
+            });
+            remote.execute(atualizaDistancia);
+            return usuariosInteressantes; 
         }
-        atualizaDistancia = new JcQuery(); 
-        atualizaDistancia.setClauses(new IClause[] {
-            MATCH.node(usuarioSeguido).label("Usuario"),
-            DO.SET(usuarioSeguido.property("distancia")).to(0)
-        });
-        remote.execute(atualizaDistancia);
-        return usuariosInteressantes; 
+        else {
+            JcQuery obtencaoUsuarios = new JcQuery();
+            obtencaoUsuarios.setClauses(new IClause[] {
+                MATCH.node(usuarioSeguido).label("Usuario"),
+                RETURN.value(usuarioSeguido).LIMIT(numeroPessoas)
+            });
+            List<GrNode> usuarios = remote.execute(obtencaoUsuarios).resultOf(usuarioSeguido); 
+            return usuarios;
+        }
     }
 }

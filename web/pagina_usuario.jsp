@@ -141,7 +141,7 @@
             <!-- Right Nav Section -->
             <ul class="right">
                 <li><form method="post" action="ExcluirConta"><input type="submit" value="Excluir conta" class="button"></form></li>
-                <li><a href="pagina_usuario.jsp?msg=<%=usernameLogado%>">Minha página</a></li>
+                <li><a href="pagina_usuario.jsp?msg=<%=ControleLogin.getUsernameLogado()%>">Minha página</a></li>
                 <li><a href="criacao_pagina.jsp">Criar página</a></li>                
                               
                 <li><a href="redirect.jsp">Sair</a></li>

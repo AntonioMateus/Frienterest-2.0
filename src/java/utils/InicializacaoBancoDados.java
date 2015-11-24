@@ -91,7 +91,7 @@ public class InicializacaoBancoDados extends HttpServlet {
 
         Usuario;
     }
-
+    
     /**
      * Handles the HTTP <code>POST</code> method.
      *
@@ -117,6 +117,7 @@ public class InicializacaoBancoDados extends HttpServlet {
         JcNode palavraChave = new JcNode("PalavraChave");
         JcNode usuario = new JcNode("Usuario");
         final int NUM_PALAVRAS = 20;
+        final int NUM_PAGINAS = 10; 
         final int NUM_USUARIOS = 30;
         final int NUM_SOBRENOMES = 30;
         try {
@@ -180,6 +181,8 @@ public class InicializacaoBancoDados extends HttpServlet {
                         .property("nascimento").value((j % 28) + "/" + (j % 12) + "/" + (j + 1980))
                         .property("sobre").value("Sou mais uma pessoa interessante! Fui a numero " + j + " a me cadastrar!")
                         .property("validado").value("sim")
+                        .property("distancia").value(0)
+                        .property("interesses").value("00000010000010000101")
                     });
                     result = remote.execute(query);
                     if (result.hasErrors()) {
@@ -212,6 +215,38 @@ public class InicializacaoBancoDados extends HttpServlet {
 
                 if (j < NUM_USUARIOS) {
                     System.out.println("Houve erros durante a criacao dos usuarios");
+                }
+                
+                String descricao = "Pagina de teste";
+                
+                Random r = new Random();
+                JcNode pagina = new JcNode("Pagina");
+                JcQuery criacaoPagina, relacionamentoPagina;
+                
+                for (int k = 0; k < NUM_PAGINAS; k++) {
+                    String nome = "Pagina"+(k+1);
+                    criacaoPagina = new JcQuery();
+                    criacaoPagina.setClauses(new IClause[] {
+                        CREATE.node(pagina).label("Pagina")
+                            .property("nome").value(nome)
+                            .property("descricao").value(descricao)
+                            .property("interesses").value("00010000100001000001")
+                            .property("distancia").value(0)
+                    });
+                    remote.execute(criacaoPagina);
+                    char[] palavrasChave = "00010000100001000001".toCharArray();
+                    for (int l = 0; l < 20; l++) {                        
+                        if (palavrasChave[l] == '1') {
+                            relacionamentoPagina = new JcQuery();
+                            relacionamentoPagina.setClauses(new IClause[] {
+                                MATCH.node(pagina).label("Pagina").property("nome").value(nome),
+                                MATCH.node(palavraChave).label("PalavraChave").property("id").value("" +l),
+                                CREATE.node(pagina).relation().out().type("PossuiPalavraChave").node(palavraChave)
+                            });
+                            remote.execute(relacionamentoPagina);
+                        }
+                    }           
+                    
                 }
             }
             response.sendRedirect("redirect.jsp");

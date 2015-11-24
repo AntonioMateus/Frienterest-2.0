@@ -64,55 +64,66 @@ public class SugestaoPaginas {
             RETURN.value(usuario)
         });
         String interessesUsuario = remote.execute(obtencaoUsuario).resultOf(usuario).get(0).getProperty("interesses").getValue().toString();
-        JcQuery obtencaoPaginas = new JcQuery();
-        obtencaoPaginas.setClauses(new IClause[] {
-            MATCH.node(pagina).label("Pagina"),
-            RETURN.value(pagina)
-        });
-        List<GrNode> paginas = remote.execute(obtencaoPaginas).resultOf(pagina);
-        JcQuery atualizacaoDistancias; 
-        for (GrNode pagina1 : paginas) {
-            atualizacaoDistancias = new JcQuery();
-            atualizacaoDistancias.setClauses(new IClause[]{
-                MATCH.node(pagina).label("Pagina").property("nome").value(pagina1.getProperty("nome").getValue().toString()), 
-                DO.SET(pagina.property("distancia")).to(distanciaEuclidiana(interessesUsuario, pagina1.getProperty("interesses").getValue().toString()))
+        if (interessesUsuario.equals("00000000000000000000")) {
+            JcQuery obtencaoPaginas = new JcQuery();
+            obtencaoPaginas.setClauses(new IClause[] {
+                MATCH.node(pagina).label("Pagina"),
+                RETURN.value(pagina)
             });
-            remote.execute(atualizacaoDistancias);
-        }
-        JcQuery obtencaoPaginasMaisProximas = new JcQuery();
-        obtencaoPaginasMaisProximas.setClauses(new IClause[] {
-            MATCH.node(pagina).label("Pagina"),
-            RETURN.value(pagina).ORDER_BY_DESC("distancia")
-        });
-        List<GrNode> paginasPossivelmenteInteressantes = remote.execute(obtencaoPaginasMaisProximas).resultOf(pagina);
-        List<GrNode> paginasInteressantes = new LinkedList<>(); 
-        JcQuery verificacaoSeInteresseMostrado; 
-        int contadorPaginas = 0;
-        JcRelation relacao = new JcRelation("Segue");
-        for (GrNode paginaRetornada: paginasPossivelmenteInteressantes) {
-            if (contadorPaginas < numeroPaginas) {
-                verificacaoSeInteresseMostrado = new JcQuery(); 
-                verificacaoSeInteresseMostrado.setClauses(new IClause[] {
-                    MATCH.node(usuario).label("Usuario").property("username").value(username).relation(relacao).out().
-                            type("MostraInteresse").node(pagina).label("Pagina").property("nome").
-                            value(paginaRetornada.getProperty("nome").getValue().toString()),
-                    RETURN.value(relacao)                        
+            List<GrNode> paginas = remote.execute(obtencaoPaginas).resultOf(pagina);
+            JcQuery atualizacaoDistancias; 
+            for (GrNode pagina1 : paginas) {
+                atualizacaoDistancias = new JcQuery();
+                atualizacaoDistancias.setClauses(new IClause[]{
+                    MATCH.node(pagina).label("Pagina").property("nome").value(pagina1.getProperty("nome").getValue().toString()), 
+                    DO.SET(pagina.property("distancia")).to(distanciaEuclidiana(interessesUsuario, pagina1.getProperty("interesses").getValue().toString()))
                 });
-                List<GrRelation> resultadoVerificacao = remote.execute(verificacaoSeInteresseMostrado).resultOf(relacao);
-                if (resultadoVerificacao.isEmpty()) {
-                    paginasInteressantes.add(paginaRetornada);
-                    contadorPaginas++; 
+                remote.execute(atualizacaoDistancias);
+            }
+            JcQuery obtencaoPaginasMaisProximas = new JcQuery();
+            obtencaoPaginasMaisProximas.setClauses(new IClause[] {
+                MATCH.node(pagina).label("Pagina"),
+                RETURN.value(pagina).ORDER_BY_DESC("distancia")
+            });
+            List<GrNode> paginasPossivelmenteInteressantes = remote.execute(obtencaoPaginasMaisProximas).resultOf(pagina);
+            List<GrNode> paginasInteressantes = new LinkedList<>(); 
+            JcQuery verificacaoSeInteresseMostrado; 
+            int contadorPaginas = 0;
+            JcRelation relacao = new JcRelation("Segue");
+            for (GrNode paginaRetornada: paginasPossivelmenteInteressantes) {
+                if (contadorPaginas < numeroPaginas) {
+                    verificacaoSeInteresseMostrado = new JcQuery(); 
+                    verificacaoSeInteresseMostrado.setClauses(new IClause[] {
+                        MATCH.node(usuario).label("Usuario").property("username").value(username).relation(relacao).out().
+                                type("MostraInteresse").node(pagina).label("Pagina").property("nome").
+                                value(paginaRetornada.getProperty("nome").getValue().toString()),
+                        RETURN.value(relacao)                        
+                    });
+                    List<GrRelation> resultadoVerificacao = remote.execute(verificacaoSeInteresseMostrado).resultOf(relacao);
+                    if (resultadoVerificacao.isEmpty()) {
+                        paginasInteressantes.add(paginaRetornada);
+                        contadorPaginas++; 
+                    }
+                }
+                else {
+                    break; 
                 }
             }
-            else {
-                break; 
-            }
+            atualizacaoDistancias = new JcQuery(); 
+            atualizacaoDistancias.setClauses(new IClause[] {
+                MATCH.node(pagina).label("Pagina"),
+                DO.SET(pagina.property("distancia")).to(0)
+            });
+            return paginasInteressantes;
         }
-        atualizacaoDistancias = new JcQuery(); 
-        atualizacaoDistancias.setClauses(new IClause[] {
-            MATCH.node(pagina).label("Pagina"),
-            DO.SET(pagina.property("distancia")).to(0)
-        });
-        return paginasInteressantes;
+        else {
+            JcQuery obtencaoPaginas = new JcQuery();
+            obtencaoPaginas.setClauses(new IClause[] {
+                MATCH.node(pagina).label("Pagina"),
+                RETURN.value(pagina).LIMIT(numeroPaginas)
+            });
+            List<GrNode> paginas = remote.execute(obtencaoPaginas).resultOf(pagina);
+            return paginas; 
+        }
     }
 }
