@@ -10,12 +10,15 @@ import iot.jcypher.database.DBProperties;
 import iot.jcypher.database.DBType;
 import iot.jcypher.database.IDBAccess;
 import iot.jcypher.graph.GrNode;
+import iot.jcypher.graph.GrRelation;
 import iot.jcypher.query.JcQuery;
 import iot.jcypher.query.api.IClause;
 import iot.jcypher.query.factories.clause.DO;
 import iot.jcypher.query.factories.clause.MATCH;
 import iot.jcypher.query.factories.clause.RETURN;
 import iot.jcypher.query.values.JcNode;
+import iot.jcypher.query.values.JcRelation;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
@@ -79,14 +82,37 @@ public class SugestaoPaginas {
         JcQuery obtencaoPaginasMaisProximas = new JcQuery();
         obtencaoPaginasMaisProximas.setClauses(new IClause[] {
             MATCH.node(pagina).label("Pagina"),
-            RETURN.value(pagina).ORDER_BY_DESC("distancia").LIMIT(numeroPaginas)
+            RETURN.value(pagina).ORDER_BY_DESC("distancia")
         });
-        List<GrNode> paginasARetornar = remote.execute(obtencaoPaginasMaisProximas).resultOf(pagina);
+        List<GrNode> paginasPossivelmenteInteressantes = remote.execute(obtencaoPaginasMaisProximas).resultOf(pagina);
+        List<GrNode> paginasInteressantes = new LinkedList<>(); 
+        JcQuery verificacaoSeInteresseMostrado; 
+        int contadorPaginas = 0;
+        JcRelation relacao = new JcRelation("Segue");
+        for (GrNode paginaRetornada: paginasPossivelmenteInteressantes) {
+            if (contadorPaginas < numeroPaginas) {
+                verificacaoSeInteresseMostrado = new JcQuery(); 
+                verificacaoSeInteresseMostrado.setClauses(new IClause[] {
+                    MATCH.node(usuario).label("Usuario").property("username").value(username).relation(relacao).out().
+                            type("MostraInteresse").node(pagina).label("Pagina").property("nome").
+                            value(paginaRetornada.getProperty("nome").getValue().toString()),
+                    RETURN.value(relacao)                        
+                });
+                List<GrRelation> resultadoVerificacao = remote.execute(verificacaoSeInteresseMostrado).resultOf(relacao);
+                if (resultadoVerificacao.isEmpty()) {
+                    paginasInteressantes.add(paginaRetornada);
+                    contadorPaginas++; 
+                }
+            }
+            else {
+                break; 
+            }
+        }
         atualizacaoDistancias = new JcQuery(); 
         atualizacaoDistancias.setClauses(new IClause[] {
             MATCH.node(pagina).label("Pagina"),
             DO.SET(pagina.property("distancia")).to(0)
         });
-        return paginasARetornar;
+        return paginasInteressantes;
     }
 }

@@ -87,10 +87,10 @@ public class SugestaoPessoasASeguir {
         List<GrNode> usuariosPossivelmenteInteressantes = remote.execute(obtencaoUsuariosAtualizados).resultOf(usuarioSeguido); 
         List<GrNode> usuariosInteressantes = new LinkedList<>(); 
         JcQuery verificaSeJahSegue; 
-        int contador = 0; 
+        int contadorPessoas = 0; 
         JcRelation relacao = new JcRelation("Segue");
         for (GrNode usuario: usuariosPossivelmenteInteressantes) {
-            if (!usuario.getProperty("username").getValue().toString().equals(usernameSeguidor) && contador < numeroPessoas) {
+            if (!usuario.getProperty("username").getValue().toString().equals(usernameSeguidor) && contadorPessoas < numeroPessoas) {
                 verificaSeJahSegue = new JcQuery();
                 verificaSeJahSegue.setClauses(new IClause[] {
                     MATCH.node(usuarioSeguidor).label("Usuario").property("username").value(usernameSeguidor).relation(relacao).out().node(usuarioSeguido).label("Usuario")
@@ -100,10 +100,19 @@ public class SugestaoPessoasASeguir {
                 List<GrRelation> relacoes = remote.execute(verificaSeJahSegue).resultOf(relacao);
                 if (relacoes.isEmpty()) {
                     usuariosInteressantes.add(usuario);
-                    contador++;
+                    contadorPessoas++;
                 }
             }
-        }        
+            else if (contadorPessoas >= numeroPessoas) {
+                break;
+            }
+        }
+        atualizaDistancia = new JcQuery(); 
+        atualizaDistancia.setClauses(new IClause[] {
+            MATCH.node(usuarioSeguido).label("Usuario"),
+            DO.SET(usuarioSeguido.property("distancia")).to(0)
+        });
+        remote.execute(atualizaDistancia);
         return usuariosInteressantes; 
     }
 }
