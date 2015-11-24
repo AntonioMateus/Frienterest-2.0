@@ -51,6 +51,9 @@
                 background: #2980b9
             }
 
+            .top-bar-section{
+                background: #2980b9
+            }
 
             .node circle {
                 stroke: white;
@@ -72,8 +75,6 @@
 
     </head>
     <body>
-
-
         <!-- Busca -->
 
         <nav class="top-bar" data-topbar role="navigation">
@@ -88,53 +89,43 @@
 
                     <li class="has-form">
 
-                        <div class="row collapse">
+                        <div class="large-7 small-8 columns">
 
-                            <div class="large-6 small-7 columns">
+                            <input type="text" name="pessoa" placeholder="Pessoas">
 
-                                <input type="text" name="pessoa" placeholder="Encontre Pessoas">
+                        </div>
 
-                            </div>
+                        <div class="large-5 small-4 columns">
 
-                            <div class="large-2 small-1 columns">
-
-                                <input type="submit" class="alert button expand" value="Pesquisar"></input>
-
-                            </div>
+                            <input type="submit" class="button" value="Pesquisar"></input>
 
                         </div>
 
                     </li>
                 </ul>
             </form>
-            <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
-
-            <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
-
-
 
             <section class="top-bar-section">
 
                 <!-- Right Nav Section -->
                 <%String username = ControleLogin.getUsernameLogado();%>
                 <ul class="right">
-                    <li><form method="post" action="ExcluirConta"><input type="submit" value="Excluir conta" class="button"></form></li>
                     <li><a href="pagina_usuario.jsp?msg=<%=username%>">Minha página</a></li>
                     <li><a href="criacao_pagina.jsp">Criar página</a></li>                
 
-                    <!-- <li class="has-dropdown">
-    
+                    <li class="has-dropdown">
+
                         <a href="#">Opções</a>
-    
+
                         <ul class="dropdown">
-    
-                            <li><a href="pagina_inicial.jsp">Home</a></li>
-    
-                            <li><a href="redirect.jsp">Sair</a></li>                       
-    
+                            <li>
+                                <form method="post" action="ExcluirConta">
+                                    <input type="submit" value="Excluir conta" class="alert button">
+                                </form>
+                            </li>
                         </ul>
-    
-                    </li> -->
+
+                    </li>
 
                     <li><a href="redirect.jsp">Sair</a></li>
 
