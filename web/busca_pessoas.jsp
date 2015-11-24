@@ -1,9 +1,10 @@
 <%-- 
     Document   : busca_pessoas
-    Created on : 30/09/2015, 23:35:03
-    Author     : andrew
+    Created on : 24/11/2015, 00:34:39
+    Author     : Antonio Mateus
 --%>
 
+<%@page import="java.util.LinkedList"%>
 <%@page import="utils.ControleLogin"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.Properties"%>
@@ -87,7 +88,7 @@
                     <body>
 
                         <!-- Busca -->
-
+                        
                         <nav class="top-bar" data-topbar role="navigation">
                             <form method="POST" action="BuscaPessoas">
                                 <ul class="title-area">
@@ -153,7 +154,57 @@
                             </section>
 
                         </nav>
-
+                        <%  
+                            String SERVER_ROOT_URI = "http://localhost:7474/";
+                            String usernameDB = "neo4j";
+                            String passwdDB = "dba";
+                            String termoBusca = request.getParameter("msg");
+                            Properties props = new Properties();
+                            props.setProperty(DBProperties.SERVER_ROOT_URI, SERVER_ROOT_URI);
+                            IDBAccess remote = DBAccessFactory.createDBAccess(DBType.REMOTE, props, usernameDB, passwdDB);
+                            JcNode usuario = new JcNode("Usuario");
+                            JcNode palavraChave = new JcNode("PalavraChave");
+                            JcNode pagina = new JcNode("Pagina");
+                            
+                            JcQuery buscaUsuarios = new JcQuery(); 
+                            buscaUsuarios.setClauses(new IClause[] {
+                                MATCH.node(usuario).label("Usuario").property("nome").value(termoBusca),
+                                RETURN.value(usuario)
+                            });
+                            JcQueryResult resultado = remote.execute(buscaUsuarios);
+                            if (resultado.hasErrors()) {
+                                out.print("<script>alert('Houve problemas durante a busca de usuarios')</script>");
+                            }
+                            List<GrNode> usuariosEncontrados = resultado.resultOf(usuario);
+                            List<GrNode> paginasEncontradas = new LinkedList<>(); 
+                            JcQuery buscaPaginas = new JcQuery(); 
+                            buscaPaginas.setClauses(new IClause[] {
+                                MATCH.node(pagina).label("Pagina").property("nome").value(termoBusca),
+                                RETURN.value(pagina)
+                            });
+                            resultado = remote.execute(buscaPaginas);
+                            if (resultado.hasErrors()) {
+                                out.print("<script>alert('Houve problemas durante a primeira busca de paginas')</script>");
+                            }
+                            List<GrNode> parte1 = resultado.resultOf(pagina);
+                            for (GrNode paginaEncontrada:parte1) {
+                                paginasEncontradas.add(paginaEncontrada);
+                            }    
+                            buscaPaginas = new JcQuery();
+                            buscaPaginas.setClauses(new IClause[] {
+                                MATCH.node(pagina).label("Pagina").relation().out().type("PossuiPalavraChave").node(palavraChave).label("PalavraChave").property("nome").value(termoBusca),
+                                RETURN.value(pagina)
+                            });
+                            resultado = remote.execute(buscaPaginas);
+                            if (resultado.hasErrors()) {
+                                out.print("<script>alert('Houve problemas durante a segunda busca de paginas')</script>");
+                            }
+                            List<GrNode> parte2 = resultado.resultOf(pagina);
+                            for (GrNode paginaEncontrada:parte2) {
+                                if (!paginasEncontradas.contains(paginaEncontrada))
+                                    paginasEncontradas.add(paginaEncontrada);
+                            }                            
+                        %>
                         <h2 align="center">Pessoas Interessantes</h2>
 
                         <!-- Exibicao da busca -->
@@ -173,103 +224,42 @@
 
                                 <div class="search-results">
 
-                                    <%
-                                        List pessoasEncontradas = new ArrayList();
-
-                                        pessoasEncontradas = (ArrayList) request.getAttribute("pessoasEncontradas");
-
-                                        if (pessoasEncontradas != null && pessoasEncontradas.size() > 0) {
-
-                                            for (int i = 0; i < pessoasEncontradas.size(); i++) {
-
-                                                List pessoas = (List) pessoasEncontradas.get(i);
-
+                                    <%  if (usuariosEncontrados.size() == 0) {
+                                        %><h3><%out.print("Nao foram encontrados usuarios com o nome pesquisado.");%></h3><%
+                                        } 
+                                        else {
+                                            for (GrNode usuarioEncontrado: usuariosEncontrados) {
+                                                String nome = usuarioEncontrado.getProperty("nome").getValue().toString();
+                                                String sobrenome = usuarioEncontrado.getProperty("sobrenome").getValue().toString();
+                                                String usernameEncontrado = usuarioEncontrado.getProperty("username").getValue().toString();
+                                                %><a href='pagina_usuario.jsp?msg=<%=usernameEncontrado%>'><%=(nome +" " +sobrenome)%></a><%
+                                            }    
+                                        }
+                                    
+                                        if (paginasEncontradas.size() == 0) {
+                                            %><h3><%out.print("Nao foram encontradas paginas com o nome pesquisado (ou palavra-chave pesquisada)");%></h3><%
+                                        }
+                                        else {
+                                            for (GrNode paginaEncontrada : paginasEncontradas) {
+                                                String nomePagina = paginaEncontrada.getProperty("nome").getValue().toString();
+                                                %><a href='pagina_generica.jsp?msg=<%=nomePagina%>'><%=nomePagina%></a><%
+                                            }    
+                                        }    
+                                        
                                     %>
 
-                                    <div class="row ">
+                                    
 
-                                        <div class="large-2 columns">
+                                    <hr>
 
-                                            <a href="#"> <span> </span><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Gnome-stock_person.svg/2000px-Gnome-stock_person.svg.png" alt="book cover" class=" thumbnail"></a>
-
-                                        </div>
-
-                                        <div class="large-10 columns">
-
-                                            <div class="row">
-
-                                                <div class=" large-9 columns">
-
-                                                    <h5><%= pessoas.get(2)%></h5>
-
-                                                    <p><a href="#"> Página </a> | <a href="#"> Interesses </a></p>
-
-                                                </div>
-
-                                                <div class=" large-3 columns">
-
-                                                    <a href="#"  class="button  expand medium"><span>Enviar mensagem</span> </a>
-
-                                                    <a href="#"  class="button  expand medium"><span>Adicionar como amigo(a)</span></a> 
-
-                                                </div>
-
-                                                <div class="row">
-
-                                                    <div class=" large-12 columns">
-
-                                                        <ul class="large-block-grid-2">
-
-                                                            <li>
-
-                                                                <ul>
-
-                                                                    <li><strong>Nome: </strong> <%= pessoas.get(0)%> </li>
-
-                                                                    <li><strong>Sobrenome:</strong> <%= pessoas.get(1)%> </li>
-
-                                                                    <li><strong>Interesses em comum: </strong> Nenhum </li>
-
-                                                                    <li><strong>Amizades em comum:</strong> Nenhuma </li>
-
-                                                                </ul>
-
-                                                            </li>
-
-
-                                                        </ul>
-
-                                                    </div>
-
-                                                </div> -->
-
-                                            </div>
-
-                                        </div>
-
-                                        <hr>
-
-                                    </div>         
+                                </div>         
 
                                 </div>
-                                <%                    }
-
-                                } else {
-
-                                %>
-
-                                <h4 align="center">
-                                    Nenhum resultado encontrado.
-                                </h4>
-
-                                <%}%>
-                                <!--
-                                            <a href="#" class="button right"> show more results &raquo;</a>
-                                -->
+                                
+                                
                             </div>
 
-                        </div>
-                        <!-- Exibicao da busca - Fim -->
+                           <!-- Exibicao da busca - Fim -->
 
                     </body>
             </html>
