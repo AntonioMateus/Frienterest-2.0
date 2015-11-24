@@ -4,6 +4,7 @@
     Author     : Antonio Mateus
 --%>
 
+<%@page import="utils.SugestaoPessoasASeguir"%>
 <%@page import="utils.SugestaoPaginas"%>
 <%@page import="utils.ControleLogin"%>
 <%@page import="java.util.List"%>
@@ -188,13 +189,20 @@
         </div>
         <div class="large-3 columns auth-plain">
             <% if (usernameLogado.equals(usernameDonoPagina)) { %>
-                <h4>Talvez seja de seu interesse...</h4>
+                <h4>Talvez estas páginas sejam de seu interesse...</h4>
                 <%  List<GrNode> listaPaginasInteressantes = SugestaoPaginas.retornaPaginasMaisSemelhantes(5);
                 for (GrNode paginaInteressante: listaPaginasInteressantes) {
                     String nomePaginaPossivelmenteInteressante = paginaInteressante.getProperty("nome").getValue().toString();
                     %><a href="pagina_generica.jsp?msg=<%=nomePaginaPossivelmenteInteressante%>"><%=nomePaginaPossivelmenteInteressante%></a><% 
-                }
-            
+                } %>
+                <h4>Talvez seja legal conhecer estas pessoas...</h4> 
+            <%  List<GrNode> listaPessoasInteressantes = SugestaoPessoasASeguir.retornaPessoasMaisSemelhantes(5);
+                for (GrNode pessoaInteressante: listaPessoasInteressantes) {
+                    String nomePessoaPossivelmenteInteressante = pessoaInteressante.getProperty("nome").getValue().toString();
+                    String usernamePessoaPossivelmenteInteressante = pessoaInteressante.getProperty("username").getValue().toString();
+                    String sobrenomePessoaPossivelmenteInteressante = pessoaInteressante.getProperty("sobrenome").getValue().toString();
+                    %><a href="pagina_usuario.jsp?msg=<%=usernamePessoaPossivelmenteInteressante%>"><%=nomePessoaPossivelmenteInteressante +" " +sobrenomePessoaPossivelmenteInteressante%></a><%
+                }  
             }    
             else { 
                 JcNode amigo = new JcNode ("Usuario");

@@ -106,7 +106,7 @@ public class DemonstrarInteresse extends HttpServlet {
         criacaoRelacionamento.setClauses(new IClause[]{
             MATCH.node(pagina).label("Pagina").property("nome").value(nomePagina),
             MATCH.node(usuario).label("Usuario").property("username").value(username),
-            CREATE.node(usuario).relation().out().type("Mostra_interesse").node(pagina)
+            CREATE.node(usuario).relation().out().type("MostraInteresse").node(pagina)
         });
         JcQueryResult resultado = remote.execute(criacaoRelacionamento);
         if (resultado.hasErrors()) {
