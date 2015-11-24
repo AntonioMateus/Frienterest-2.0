@@ -105,7 +105,7 @@
 
                     <li class="name">
 
-                        <h1><a href="pagina_inicial.jsp?msg=_">Frienterest &nbsp;</a></h1>
+                        <h1><a href="pagina_inicial.jsp?msg=<%=ControleLogin.getUsernameLogado()%>">Frienterest &nbsp;</a></h1>
 
                     </li>
 

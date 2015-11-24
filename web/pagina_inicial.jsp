@@ -82,7 +82,7 @@
 
                     <li class="name">
 
-                        <h1><a href="pagina_inicial.jsp">Frienterest &nbsp;</a></h1>
+                        <h1><a href="pagina_inicial.jsp?msg=<%=ControleLogin.getUsernameLogado()%>">Frienterest &nbsp;</a></h1>
 
                     </li>
 
@@ -90,13 +90,13 @@
 
                         <div class="row collapse">
 
-                            <div class="large-8 small-9 columns">
+                            <div class="large-6 small-7 columns">
 
                                 <input type="text" name="pessoa" placeholder="Encontre Pessoas">
 
                             </div>
 
-                            <div class="large-4 small-3 columns">
+                            <div class="large-2 small-1 columns">
 
                                 <input type="submit" class="alert button expand" value="Pesquisar"></input>
 

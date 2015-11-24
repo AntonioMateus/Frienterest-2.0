@@ -94,69 +94,8 @@ public class BuscaPessoas extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        final String SERVER_ROOT_URI = "http://localhost:7474/";
-        final String usernameDB = "neo4j";
-        final String passwdDB = "dba";
-
-        Properties props = new Properties();
-        props.setProperty(DBProperties.SERVER_ROOT_URI, SERVER_ROOT_URI);
-
-        IDBAccess remote
-                = DBAccessFactory.createDBAccess(DBType.REMOTE, props, usernameDB, passwdDB);
-
-        JcNode usuario = new JcNode("Usuario");
-        JcQuery query = new JcQuery();
-
-        String pessoa = request.getParameter("pessoa");
-        List pessoasEncontradas = new ArrayList();
-
-        try {
-            String[] nomeSobrenome = pessoa.split("\\s+");
-
-            if (nomeSobrenome.length == 1) {
-                query.setClauses(new IClause[]{
-                    MATCH.node(usuario).label("Usuario")
-                    .property("nome").value(nomeSobrenome[0]),
-                    RETURN.value(usuario)
-                });
-            } else if (nomeSobrenome.length == 2) {
-                query.setClauses(new IClause[]{
-                    MATCH.node(usuario).label("Usuario")
-                    .property("nome").value(nomeSobrenome[0])
-                    .property("sobrenome").value(nomeSobrenome[1]),
-                    RETURN.value(usuario)
-                });
-            }
-
-            JcQueryResult result = remote.execute(query);
-
-            if (result.hasErrors()) {
-                response.sendRedirect("criacao_conta.jsp?msg=falha");
-            }
-
-            List<GrNode> pessoas = result.resultOf(usuario);
-            ListIterator<GrNode> itPessoas = pessoas.listIterator();
-            
-            while (itPessoas.hasNext()) {
-                GrNode user = itPessoas.next();
-                List encontrou = new ArrayList();
-                String nome = (String) user.getProperty("nome").getValue().toString();
-                String sobrenome = (String) user.getProperty("sobrenome").getValue().toString();
-                String sobre = (String) user.getProperty("sobre").getValue().toString();
-                encontrou.add(nome);
-                encontrou.add(sobrenome);
-                encontrou.add(sobre);
-                pessoasEncontradas.add(encontrou);
-            }
-
-            request.setAttribute("pessoasEncontradas", pessoasEncontradas);
-            RequestDispatcher rd = request.getRequestDispatcher("busca_pessoas.jsp");
-            rd.forward(request, response);
-            
-        } catch (PatternSyntaxException ex) {
-            response.sendRedirect("pagina_inicial.jsp");
-        }
+        String termoBusca = request.getParameter("pessoa");
+        response.sendRedirect("busca_pessoas.jsp?msg="+termoBusca);
     }
 
     /**

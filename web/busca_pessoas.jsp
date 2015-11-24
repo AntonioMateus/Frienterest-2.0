@@ -4,8 +4,21 @@
     Author     : andrew
 --%>
 
+<%@page import="java.util.LinkedList"%>
+<%@page import="utils.ControleLogin"%>
 <%@page import="java.util.List"%>
-<%@page import="java.util.ArrayList"%>
+<%@page import="java.util.Properties"%>
+<%@page import="iot.jcypher.graph.GrNode"%>
+<%@page import="iot.jcypher.database.DBType"%>
+<%@page import="iot.jcypher.database.DBProperties"%>
+<%@page import="iot.jcypher.database.DBAccessFactory"%>
+<%@page import="iot.jcypher.database.IDBAccess"%>
+<%@page import="iot.jcypher.query.JcQuery"%>
+<%@page import="iot.jcypher.query.JcQueryResult"%>
+<%@page import="iot.jcypher.query.factories.clause.RETURN"%>
+<%@page import="iot.jcypher.query.values.JcNode"%>
+<%@page import="iot.jcypher.query.api.IClause"%>
+<%@page import="iot.jcypher.query.factories.clause.MATCH"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -74,14 +87,53 @@
 
                 <body>
                     <!-- Busca -->
-
+                    <% String termoBusca = request.getParameter("msg");
+                    String SERVER_ROOT_URI = "http://localhost:7474/";
+                    String usernameDB = "neo4j";
+                    String passwdDB = "dba";
+                    Properties props = new Properties();
+                    props.setProperty(DBProperties.SERVER_ROOT_URI, SERVER_ROOT_URI);
+                    IDBAccess remote = DBAccessFactory.createDBAccess(DBType.REMOTE, props, usernameDB, passwdDB);
+                    JcNode usuario = new JcNode("Usuario");
+                    JcNode pagina = new JcNode("Pagina");
+                    JcNode palavraChave = new JcNode("PalavraChave"); 
+                    JcQuery buscaUsuarios = new JcQuery();
+                    buscaUsuarios.setClauses(new IClause[] {
+                        MATCH.node(usuario).label("Usuario").property("nome").value(termoBusca),
+                        RETURN.value(usuario)
+                    });
+                    JcQueryResult resultado = remote.execute(buscaUsuarios); 
+                    if (resultado.hasErrors()) {
+                        out.print("<script>alert('Erro na busca de usuarios')</script>");
+                    }
+                    List<GrNode> usuariosResultantes = resultado.resultOf(usuario);
+                    JcQuery buscaPaginas = new JcQuery();
+                    buscaPaginas.setClauses(new IClause[] {
+                        MATCH.node(pagina).label("Pagina").property("nome").value(termoBusca),
+                        RETURN.value(pagina)
+                    });
+                    resultado = remote.execute(buscaPaginas); 
+                    if (resultado.hasErrors()) {
+                        out.print("<script>alert('Erro na busca de paginas')</script>");
+                    }
+                    List<GrNode> paginasResultantes1 = resultado.resultOf(pagina);
+                    buscaPaginas = new JcQuery();
+                    buscaPaginas.setClauses(new IClause[] {
+                        MATCH.node(pagina).label("Pagina").relation().out().type("PossuiPalavraChave").node(palavraChave).label("PalavraChave").property("nome").value("termoBusca"),
+                        RETURN.value(pagina)
+                    });
+                    resultado = remote.execute(buscaPaginas);
+                    if (resultado.hasErrors()) {
+                        out.print("<script>alert('Erro na busca de paginas')</script>");
+                    }
+                    List<GrNode> paginasResultantes2 = resultado.resultOf(pagina); %>
                     <nav class="top-bar" data-topbar role="navigation">
                         <form method="POST" action="BuscaPessoas">
                             <ul class="title-area">
 
                                 <li class="name">
 
-                                    <h1><a href="pagina_inicial.jsp">Frienterest &nbsp;</a></h1>
+                                    <h1><a href="pagina_inicial.jsp?msg=<%=ControleLogin.getUsernameLogado()%>">Frienterest &nbsp;</a></h1>
 
                                 </li>
 
@@ -168,21 +220,38 @@
                             </div>
 
                             <div class="search-results">
+                                
+                                <%  if (usuariosResultantes.size() == 0) {
+                                       %><h3><% out.print("Nao foi encontrado nenhum usuario com o nome " +termoBusca); %></h3><%
+                                    }
+                                    else {
+                                        for (GrNode usuarioEncontrado:usuariosResultantes) {
+                                            String nome = usuarioEncontrado.getProperty("nome").getValue().toString();
+                                            String sobrenome = usuarioEncontrado.getProperty("sobrenome").getValue().toString(); 
+                                            String username = usuarioEncontrado.getProperty("username").getValue().toString();
+                                            %><a href='pagina_usuario.jsp?msg=<%=username%>'><%=(nome + " " +sobrenome)%></a><%
+                                        }    
+                                    }
+                                
+                                    if (paginasResultantes1.size() == 0 && paginasResultantes2.size() == 0) {
+                                        %><h3><% out.print("Nao foi encontrado nenhuma pagina com o nome " +termoBusca); %></h3><%
+                                    }
+                                    else {
+                                        List<GrNode> paginasEncontradas = new LinkedList<>();
+                                        for (GrNode paginaEncontrada:paginasResultantes1) {
+                                            paginasEncontradas.add(paginaEncontrada);
+                                        }
+                                        for (GrNode paginaEncontrada:paginasResultantes2) {
+                                            if (!paginasEncontradas.contains(paginaEncontrada))
+                                                paginasEncontradas.add(paginaEncontrada);
+                                        }
+                                        for (GrNode paginaEncontrada:paginasEncontradas) {
+                                            String nomePagina = paginaEncontrada.getProperty("nome").getValue().toString();
+                                            %><a href='pagina_generica.jsp?msg=<%=nomePagina%>'><%=nomePagina%></a><%
+                                        }    
+                                    }%>
 
-                                <%
-                                    List pessoasEncontradas = new ArrayList();
-
-                                    pessoasEncontradas = (ArrayList) request.getAttribute("pessoasEncontradas");
-
-                                    if (pessoasEncontradas != null && pessoasEncontradas.size() > 0) {
-
-                                        for (int i = 0; i < pessoasEncontradas.size(); i++) {
-
-                                            List pessoas = (List) pessoasEncontradas.get(i);
-
-                                %>
-
-                                <div class="row ">
+                                <!--<div class="row ">
 
                                     <div class="large-2 columns">
 
@@ -196,7 +265,7 @@
 
                                             <div class=" large-9 columns">
 
-                                                <h5><%= pessoas.get(2)%></h5>
+                                                <h5><></h5>
 
                                                 <p><a href="#"> Página </a> | <a href="#"> Interesses </a></p>
 
@@ -220,9 +289,9 @@
 
                                                             <ul>
 
-                                                                <li><strong>Nome: </strong> <%= pessoas.get(0)%> </li>
+                                                                <li><strong>Nome: </strong> <> </li>
 
-                                                                <li><strong>Sobrenome:</strong> <%= pessoas.get(1)%> </li>
+                                                                <li><strong>Sobrenome:</strong>  </li>
 
                                                                 <li><strong>Interesses em comum: </strong> Nenhum </li>
 
@@ -235,7 +304,7 @@
 
                                                     </ul>
 
-                                                </div>
+                                                </div> -->
 
                                             </div>
 
@@ -245,12 +314,12 @@
 
                                     <hr>
 
-                                </div>         
+                               <!-- </div>         
 
                             </div>
-                            <%                    }
+                                                }
 
-                            } else {
+                           
 
                             %>
 
@@ -258,13 +327,12 @@
                                 Nenhum resultado encontrado.
                             </h4>
 
-                            <%}%>
-                            <!--
+                                       <!--
                                         <a href="#" class="button right"> show more results &raquo;</a>
-                            -->
+                            
                         </div>
 
-                    </div>
+                    </div>-->
                     <!-- Exibicao da busca - Fim -->
 
                 </body>

@@ -4,6 +4,7 @@
     Author     : Antonio Mateus
 --%>
 
+<%@page import="utils.ControleLogin"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.Properties"%>
 <%@page import="iot.jcypher.graph.GrNode"%>
@@ -95,7 +96,7 @@
 
                     <li class="name">
 
-                        <h1><a href="pagina_inicial.jsp?msg=_">Frienterest &nbsp;</a></h1>
+                        <h1><a href="pagina_inicial.jsp?msg=<%=ControleLogin.getUsernameLogado()%>">Frienterest &nbsp;</a></h1>
 
                     </li>
 
